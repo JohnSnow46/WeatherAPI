@@ -22,10 +22,25 @@ public sealed class FakeWeatherClient : IWeatherClient
             Daily: [new DailyForecastPoint(DateOnly.FromDateTime(DateTime.UtcNow), 25.0, 15.0, 0.0, 1)]));
 }
 
+public sealed class FakeRadarClient : IRadarClient
+{
+    public Task<RadarInfo> GetRadarInfoAsync(CancellationToken cancellationToken) =>
+        Task.FromResult(new RadarInfo(
+            "https://tilecache.rainviewer.com",
+            Past: [new RadarFrame(1700000000, "/v2/radar/1700000000")],
+            Nowcast: [new RadarFrame(1700000600, "/v2/radar/nowcast_1700000600")]));
+}
+
+public sealed class FakeWeatherTileClient : IWeatherTileClient
+{
+    public Task<MapTile> GetTileAsync(string layer, int z, int x, int y, CancellationToken cancellationToken) =>
+        Task.FromResult(new MapTile([1, 2, 3], "image/png"));
+}
+
 public sealed class FakeHealthCheck(HealthStatus status) : IHealthCheck
 {
     public Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext context,
         CancellationToken cancellationToken = default) =>
-        Task.FromResult(new HealthCheckResult(status, "fake open-meteo check"));
+        Task.FromResult(new HealthCheckResult(status, "fake health check"));
 }

@@ -35,3 +35,12 @@ public sealed record DailyForecastPointDto(
 public sealed record ForecastDto(
     IReadOnlyList<HourlyForecastPointDto> Hourly,
     IReadOnlyList<DailyForecastPointDto> Daily);
+
+public sealed record RadarFrameDto(long Time, string Path);
+
+public sealed record RadarInfoDto(
+    string Host,
+    IReadOnlyList<RadarFrameDto> Past,
+    IReadOnlyList<RadarFrameDto> Nowcast);
+
+public sealed record MapTileDto(byte[] Content, string ContentType);

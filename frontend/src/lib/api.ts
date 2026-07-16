@@ -83,3 +83,13 @@ export function getForecast(latitude: number, longitude: number, days = 5): Prom
   const params = new URLSearchParams({ lat: String(latitude), lon: String(longitude), days: String(days) });
   return apiFetch<ForecastDto>(`/api/weather/forecast?${params.toString()}`);
 }
+
+// OpenWeatherMap's Weather Maps 1.0 free-tier layers, proxied through the
+// backend (must match GetMapTileQueryValidator.AllowedLayers on the API).
+export type MapTileLayer = "wind_new" | "clouds_new" | "precipitation_new" | "pressure_new" | "temp_new";
+
+// Leaflet substitutes {z}/{x}/{y} itself, so this is just a URL template,
+// not a per-tile fetch — the backend proxies each requested tile.
+export function mapTileUrlTemplate(layer: MapTileLayer): string {
+  return `${API_BASE_URL}/api/weather/map-tiles/${layer}/{z}/{x}/{y}`;
+}

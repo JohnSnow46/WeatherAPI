@@ -19,4 +19,13 @@ public static class Mapping
 
     public static ForecastDto ToDto(this Forecast forecast) =>
         new(forecast.Hourly.Select(ToDto).ToList(), forecast.Daily.Select(ToDto).ToList());
+
+    public static RadarFrameDto ToDto(this RadarFrame frame) =>
+        new(frame.Time, frame.Path);
+
+    public static RadarInfoDto ToDto(this RadarInfo info) =>
+        new(info.Host, info.Past.Select(ToDto).ToList(), info.Nowcast.Select(ToDto).ToList());
+
+    public static MapTileDto ToDto(this MapTile tile) =>
+        new(tile.Content, tile.ContentType);
 }

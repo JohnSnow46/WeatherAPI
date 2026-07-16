@@ -9,4 +9,8 @@ public sealed class CacheOptions
     public int CurrentWeatherTtlMinutes { get; set; } = 10;
 
     public int ForecastTtlMinutes { get; set; } = 15;
+
+    public int RadarInfoTtlMinutes { get; set; } = 5;
+
+    public int MapTileTtlMinutes { get; set; } = 45;
 }

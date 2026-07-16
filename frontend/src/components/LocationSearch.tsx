@@ -43,7 +43,19 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
   }, [query]);
 
   return (
-    <div className="relative w-full max-w-sm">
+    <div className="relative w-full max-w-sm flex-1">
+      <svg
+        className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
+        viewBox="0 0 20 20"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.75}
+        aria-hidden
+      >
+        <circle cx="9" cy="9" r="6.5" />
+        <path d="M17.5 17.5 14 14" strokeLinecap="round" />
+      </svg>
+
       <input
         type="text"
         value={query}
@@ -51,15 +63,15 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
         onFocus={() => results.length > 0 && setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         placeholder="Search for a city…"
-        className="w-full rounded-full border border-black/10 bg-white px-4 py-2 text-sm text-black shadow-sm outline-none focus:border-black/30 dark:border-white/15 dark:bg-zinc-900 dark:text-white dark:focus:border-white/30"
+        className="w-full rounded-full bg-transparent py-2 pl-10 pr-4 text-sm text-ink-primary outline-none placeholder:text-ink-muted"
       />
 
       {isOpen && (query.trim().length >= 2) && (
-        <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg dark:border-white/15 dark:bg-zinc-900">
-          {isSearching && <li className="px-4 py-2 text-sm text-zinc-500">Searching…</li>}
+        <ul className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
+          {isSearching && <li className="px-4 py-2 text-sm text-ink-secondary">Searching…</li>}
           {!isSearching && error && <li className="px-4 py-2 text-sm text-red-500">{error}</li>}
           {!isSearching && !error && results.length === 0 && (
-            <li className="px-4 py-2 text-sm text-zinc-500">No matching locations.</li>
+            <li className="px-4 py-2 text-sm text-ink-secondary">No matching locations.</li>
           )}
           {!isSearching &&
             !error &&
@@ -74,7 +86,7 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
                     setResults([]);
                     setIsOpen(false);
                   }}
-                  className="block w-full px-4 py-2 text-left text-sm text-black hover:bg-black/5 dark:text-white dark:hover:bg-white/10"
+                  className="block w-full px-4 py-2 text-left text-sm text-ink-primary hover:bg-accent/10"
                 >
                   {formatLocationLabel(location)}
                 </button>

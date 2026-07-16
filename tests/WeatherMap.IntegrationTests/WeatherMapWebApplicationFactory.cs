@@ -22,11 +22,22 @@ public sealed class WeatherMapWebApplicationFactory : WebApplicationFactory<Prog
             services.RemoveAll<IWeatherClient>();
             services.AddSingleton<IWeatherClient, FakeWeatherClient>();
 
+            services.RemoveAll<IRadarClient>();
+            services.AddSingleton<IRadarClient, FakeRadarClient>();
+
+            services.RemoveAll<IWeatherTileClient>();
+            services.AddSingleton<IWeatherTileClient, FakeWeatherTileClient>();
+
             services.Configure<HealthCheckServiceOptions>(options =>
             {
                 options.Registrations.Clear();
                 options.Registrations.Add(new HealthCheckRegistration(
                     "open-meteo",
+                    _ => new FakeHealthCheck(HealthStatus.Healthy),
+                    failureStatus: null,
+                    tags: ["external"]));
+                options.Registrations.Add(new HealthCheckRegistration(
+                    "rainviewer",
                     _ => new FakeHealthCheck(HealthStatus.Healthy),
                     failureStatus: null,
                     tags: ["external"]));

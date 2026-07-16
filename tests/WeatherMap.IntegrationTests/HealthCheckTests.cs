@@ -19,5 +19,6 @@ public class HealthCheckTests(WeatherMapWebApplicationFactory factory) : IClassF
 
         var checks = body.GetProperty("checks").EnumerateArray().ToList();
         Assert.Contains(checks, c => c.GetProperty("name").GetString() == "open-meteo");
+        Assert.Contains(checks, c => c.GetProperty("name").GetString() == "rainviewer");
     }
 }

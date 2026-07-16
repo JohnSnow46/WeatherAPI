@@ -19,3 +19,28 @@ GET {{WeatherMap.Api_HostAddress}}/api/weather/forecast?lat=51.11&lon=17.03&days
 Accept: application/json
 
 ###
+
+GET {{WeatherMap.Api_HostAddress}}/api/weather/radar-tiles
+Accept: application/json
+
+###
+
+GET {{WeatherMap.Api_HostAddress}}/api/weather/map-tiles/wind_new/5/17/10
+
+###
+
+GET {{WeatherMap.Api_HostAddress}}/api/weather/map-tiles/clouds_new/5/17/10
+
+###
+
+GET {{WeatherMap.Api_HostAddress}}/api/weather/map-tiles/precipitation_new/5/17/10
+
+###
+
+GET {{WeatherMap.Api_HostAddress}}/api/weather/map-tiles/pressure_new/5/17/10
+
+###
+
+GET {{WeatherMap.Api_HostAddress}}/api/weather/map-tiles/temp_new/5/17/10
+
+###

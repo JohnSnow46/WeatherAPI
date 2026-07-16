@@ -35,7 +35,7 @@ export function ForecastPanel({ location }: { location: SelectedLocation }) {
   });
 
   if (isLoading) {
-    return <p className="text-sm text-zinc-500">Loading forecast…</p>;
+    return <p className="text-sm text-ink-secondary">Loading forecast…</p>;
   }
 
   if (isError) {
@@ -57,22 +57,20 @@ export function ForecastPanel({ location }: { location: SelectedLocation }) {
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6">
       <section>
-        <h3 className="mb-2 text-sm font-medium text-zinc-500">Next hours</h3>
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        <h3 className="mb-2 text-sm font-medium text-ink-secondary">Next hours</h3>
+        <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">
           {upcomingHourly.map((point) => {
             const { icon } = describeWeatherCode(point.weatherCode);
             return (
               <div
                 key={point.time}
-                className="flex min-w-[4.5rem] flex-col items-center gap-1 rounded-2xl border border-black/10 bg-white px-3 py-2 text-center dark:border-white/15 dark:bg-zinc-900"
+                className="flex min-w-[4.5rem] flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-2.5 text-center shadow-sm transition-shadow hover:shadow-md"
               >
-                <span className="text-xs text-zinc-500">{formatHour(point.time)}</span>
+                <span className="text-xs text-ink-muted">{formatHour(point.time)}</span>
                 <span className="text-xl" aria-hidden>
                   {icon}
                 </span>
-                <span className="text-sm font-medium text-black dark:text-white">
-                  {Math.round(point.temperatureC)}°
-                </span>
+                <span className="text-sm font-medium text-ink-primary">{Math.round(point.temperatureC)}°</span>
               </div>
             );
           })}
@@ -80,21 +78,23 @@ export function ForecastPanel({ location }: { location: SelectedLocation }) {
       </section>
 
       <section>
-        <h3 className="mb-2 text-sm font-medium text-zinc-500">Next days</h3>
+        <h3 className="mb-2 text-sm font-medium text-ink-secondary">Next days</h3>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
           {data.daily.map((point) => {
             const { label, icon } = describeWeatherCode(point.weatherCode);
             return (
               <div
                 key={point.date}
-                className="flex flex-col items-center gap-1 rounded-2xl border border-black/10 bg-white px-3 py-3 text-center dark:border-white/15 dark:bg-zinc-900"
+                className="flex flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-3 text-center shadow-sm transition-shadow hover:shadow-md"
               >
-                <span className="text-sm font-medium text-black dark:text-white">{formatWeekday(point.date)}</span>
+                <span className="text-sm font-medium text-ink-primary">{formatWeekday(point.date)}</span>
                 <span className="text-2xl" aria-hidden title={label}>
                   {icon}
                 </span>
-                <span className="text-sm text-black dark:text-white">
-                  {Math.round(point.tempMaxC)}° / {Math.round(point.tempMinC)}°
+                <span className="text-sm text-ink-secondary">
+                  <span className="font-medium text-ink-primary">{Math.round(point.tempMaxC)}°</span>
+                  {" / "}
+                  {Math.round(point.tempMinC)}°
                 </span>
               </div>
             );

@@ -53,4 +53,45 @@ public class WeatherEndpointsTests(WeatherMapWebApplicationFactory factory) : IC
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
+
+    [Fact]
+    public async Task RadarTiles_ReturnsOk()
+    {
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/weather/radar-tiles");
+
+        response.EnsureSuccessStatusCode();
+    }
+
+    [Fact]
+    public async Task MapTiles_ReturnsOk_ForValidLayerAndTileCoordinates()
+    {
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/weather/map-tiles/wind_new/5/17/10");
+
+        response.EnsureSuccessStatusCode();
+        Assert.Equal("image/png", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task MapTiles_ReturnsBadRequest_ForInvalidZoom()
+    {
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/weather/map-tiles/wind_new/99/17/10");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task MapTiles_ReturnsBadRequest_ForUnknownLayer()
+    {
+        var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/weather/map-tiles/not_a_real_layer/5/17/10");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 }
