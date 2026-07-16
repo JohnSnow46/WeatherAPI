@@ -9,14 +9,7 @@ No login, no database, no SignalR — the backend is a deliberately lightweight,
 aggregator. The point of the project is the integration and architecture work, not
 infrastructure.
 
-![WeatherMap — light mode](docs/images/hero-light.png)
-
-<details>
-<summary>Dark mode</summary>
-
-![WeatherMap — dark mode](docs/images/hero-dark.png)
-
-</details>
+![WeatherMap](docs/images/hero.png)
 
 ## Features
 
