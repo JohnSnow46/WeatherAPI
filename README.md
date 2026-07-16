@@ -155,10 +155,6 @@ frontend/                     # Next.js (App Router) + TypeScript
 docs/                         # screenshots (architecture is documented above, in this README)
 ```
 
-See [CLAUDE.md](./CLAUDE.md) for the full project spec — goals, staged build plan,
-technical risks and the decisions made along the way (e.g. why the map's weather layers
-are an OpenWeatherMap tile proxy rather than a custom vector-field grid).
-
 ## Deployment
 
 Suggested free-tier setup: **Vercel** for the frontend (built for Next.js, zero-config),
