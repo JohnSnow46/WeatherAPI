@@ -19,7 +19,7 @@ Target audience for this spec: recruiters/tech leads reviewing the repo — the 
 **Frontend**
 - Next.js (App Router) + TypeScript
 - Map: **Leaflet** (via `react-leaflet`)
-- Wind visualization: **OpenWeatherMap wind tile layer**, proxied through the backend — see section 9 for why this replaced the originally-planned `leaflet-velocity` point-grid approach
+- Wind/clouds/pressure/temperature visualization: **OpenWeatherMap tile layers**, proxied through the backend via a single generic endpoint (`layer` route parameter) — see section 9 for why this replaced the originally-planned `leaflet-velocity` point-grid approach
 - Data fetching: **TanStack Query**
 - Browser geolocation (Geolocation API) — opt-in via a "Use my location" button, not auto-requested on load (see section 9: an automatic permission prompt on entry read as pushy in testing)
 - Defaults to Warsaw, Poland on first visit if nothing is stored yet
@@ -29,7 +29,7 @@ Target audience for this spec: recruiters/tech leads reviewing the repo — the 
 **Weather data sources**
 - **Open-Meteo** — primary source (forecast, hourly data, wind, precipitation; no API key required), plus the Open-Meteo Geocoding API for the location search
 - **RainViewer API** — free precipitation/storm radar tiles (Open-Meteo has no ready-made map tiles), used for the visual precipitation layer on the map, no API key required
-- **OpenWeatherMap** — tile layer for the wind visualization (`wind_new`). Unlike Open-Meteo/RainViewer, this **requires a free API key** (openweathermap.org) — never committed, set via `dotnet user-secrets` locally or an environment variable in deployment
+- **OpenWeatherMap** — Weather Maps 1.0 tile layers: wind (`wind_new`), clouds (`clouds_new`), pressure (`pressure_new`), and temperature (`temp_new`). Unlike Open-Meteo/RainViewer, this **requires a free API key** (openweathermap.org) — never committed, set via `dotnet user-secrets` locally or an environment variable in deployment
 
 ## 3. Backend architecture (Clean Architecture, no persistence)
 
@@ -50,7 +50,7 @@ tests/
 - [x] Location search (geocoding) as an alternative/way to change location
 - [x] Remembering the last selected location in localStorage
 - [x] Weather forecast (current + hourly + a few days)
-- [x] Map layers: precipitation/storm (RainViewer radar) + wind (OpenWeatherMap tile layer)
+- [x] Map layers: precipitation/storm (RainViewer radar) + wind/clouds/pressure/temperature (OpenWeatherMap tile layers)
 - [x] Backend-side caching of external API responses (`IMemoryCache`, TTL)
 - [x] Health checks (`/health`) for the API and its external dependencies
 
@@ -61,7 +61,7 @@ GET  /api/locations/search?query=Wroclaw
 GET  /api/weather/current?lat=..&lon=..
 GET  /api/weather/forecast?lat=..&lon=..
 GET  /api/weather/radar-tiles                # RainViewer frame metadata (host + past/nowcast paths)
-GET  /api/weather/wind-tiles/{z}/{x}/{y}      # OpenWeatherMap wind tile, proxied (hides the API key)
+GET  /api/weather/map-tiles/{layer}/{z}/{x}/{y}  # OpenWeatherMap tile, proxied (hides the API key); layer: wind_new|clouds_new|precipitation_new|pressure_new|temp_new
 ```
 
 The backend here is primarily an **aggregator/proxy** — it normalizes responses from Open-Meteo, RainViewer and OpenWeatherMap into a single DTO contract, caches them, and hides provider details (including the OpenWeatherMap API key) from the frontend.
@@ -71,7 +71,7 @@ The backend here is primarily an **aggregator/proxy** — it normalizes response
 - Commits: Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`)
 - Unit tests for the Application layer before/alongside implementation
 - Don't commit API keys (RainViewer/Open-Meteo require no keys; OpenWeatherMap does — set it via `dotnet user-secrets` locally / an environment variable in deployment, never in `appsettings.json`)
-- README with architecture, a data-flow diagram, and a demo GIF
+- README with architecture and a data-flow diagram (both as Mermaid diagrams, rendered natively on GitHub); static screenshots in place of a demo GIF (no screen-recording tooling in the dev environment this was built in) — see section 9
 
 ## 7. Stages (suggested order)
 
@@ -81,8 +81,8 @@ The backend here is primarily an **aggregator/proxy** — it normalizes response
 3. **Frontend MVP**: Next.js, geolocation + search, forecast display (no map yet), CORS between Vercel and the backend
 4. **localStorage**: remembering the last location
 5. **Map — precipitation/storm**: Leaflet + radar layer (RainViewer)
-6. **Map — wind**: OpenWeatherMap wind tile layer, proxied through the backend (see section 9)
-7. **Polishing**: handling external API errors (what the frontend shows when Open-Meteo/RainViewer/OpenWeatherMap is down), README with demo GIF
+6. **Map — wind/clouds/pressure/temperature**: OpenWeatherMap tile layers, proxied through the backend via one generic endpoint (see section 9)
+7. **Polishing**: handling external API errors (what the frontend shows when Open-Meteo/RainViewer/OpenWeatherMap is down), README with architecture/data-flow diagrams and screenshots
 
 ## 8. Hosting (free options)
 
@@ -100,7 +100,7 @@ Practical note: since the frontend and backend live on different domains, the ba
 
 ## 9. Technical risks / open questions
 
-- **Wind vectors on the map — resolved.** The original plan (`leaflet-velocity` over a custom Open-Meteo point-grid, sampling many lat/lon pairs per visible bbox) was replaced with **OpenWeatherMap's `wind_new` tile layer**, proxied through the backend the same way RainViewer's radar is. This avoids building/caching a custom grid endpoint entirely — Leaflet requests whatever `{z}/{x}/{y}` tiles are visible and the backend proxies+caches each one, same pattern as any other tile layer. Trade-off: unlike Open-Meteo/RainViewer, OpenWeatherMap requires a free API key, which must stay server-side (the backend injects it; the frontend never sees it) and is not committed to the repo. A third option (embedding a Windy.com iframe widget) was considered and rejected — it would show a real map faster but wouldn't demonstrate any backend integration work, which is the point of this portfolio project.
+- **Wind vectors on the map — resolved.** The original plan (`leaflet-velocity` over a custom Open-Meteo point-grid, sampling many lat/lon pairs per visible bbox) was replaced with **OpenWeatherMap's tile layers**, proxied through the backend the same way RainViewer's radar is. This avoids building/caching a custom grid endpoint entirely — Leaflet requests whatever `{z}/{x}/{y}` tiles are visible and the backend proxies+caches each one, same pattern as any other tile layer. Trade-off: unlike Open-Meteo/RainViewer, OpenWeatherMap requires a free API key, which must stay server-side (the backend injects it; the frontend never sees it) and is not committed to the repo. A third option (embedding a Windy.com iframe widget) was considered and rejected — it would show a real map faster but wouldn't demonstrate any backend integration work, which is the point of this portfolio project. Once the wind tile-proxy pattern was in place, it generalized cleanly to OpenWeatherMap's other Weather Maps 1.0 layers (clouds, pressure, temperature) behind a single parameterized endpoint (`/api/weather/map-tiles/{layer}/{z}/{x}/{y}`, `layer` validated against an allow-list) rather than one endpoint per layer.
 - **Open-Meteo rate limit** — the free plan has a daily call limit; backend-side caching (`IMemoryCache`, TTL on the order of several minutes) is here not so much an optimization as a necessity.
 - **RainViewer / OpenWeatherMap tile format** — both may change their tile URL scheme or licensing independently of this spec; re-check before any future changes to the map layers.
 - **Auto-prompting for geolocation on entry — resolved.** The original plan auto-requested the browser's location permission the moment the page loaded. In testing this read as a pushy/unexpected permission prompt (the page asking for a system permission before the user had done anything). Changed to: default to a fixed location (Warsaw, Poland) on first visit, with geolocation available as an explicit opt-in via a "Use my location" button. Matches general UX guidance to request permissions in response to a user action, not automatically on load.
