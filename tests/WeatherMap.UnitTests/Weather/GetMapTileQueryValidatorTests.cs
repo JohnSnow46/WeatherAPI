@@ -32,10 +32,20 @@ public class GetMapTileQueryValidatorTests
     [InlineData(20, 0, 0)]
     [InlineData(5, -1, 0)]
     [InlineData(5, 0, -1)]
+    [InlineData(5, 32, 0)]
+    [InlineData(5, 0, 32)]
     public void Validate_Fails_ForInvalidTileCoordinates(int z, int x, int y)
     {
         var result = _validator.Validate(new GetMapTileQuery("wind_new", z, x, y));
 
         Assert.False(result.IsValid);
+    }
+
+    [Fact]
+    public void Validate_Succeeds_ForMaxValidCoordinateAtZoomLevel()
+    {
+        var result = _validator.Validate(new GetMapTileQuery("wind_new", 5, 31, 31));
+
+        Assert.True(result.IsValid);
     }
 }

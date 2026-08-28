@@ -18,8 +18,12 @@ public sealed class GetMapTileQueryValidator : AbstractValidator<GetMapTileQuery
         RuleFor(x => x.Layer).Must(AllowedLayers.Contains)
             .WithMessage($"'Layer' must be one of: {string.Join(", ", AllowedLayers)}.");
         RuleFor(x => x.Z).InclusiveBetween(0, 19);
-        RuleFor(x => x.X).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Y).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.X).GreaterThanOrEqualTo(0)
+            .Must((query, x) => x < (1 << Math.Clamp(query.Z, 0, 19)))
+            .WithMessage("'X' must be less than 2^Z.");
+        RuleFor(x => x.Y).GreaterThanOrEqualTo(0)
+            .Must((query, y) => y < (1 << Math.Clamp(query.Z, 0, 19)))
+            .WithMessage("'Y' must be less than 2^Z.");
     }
 }
 
