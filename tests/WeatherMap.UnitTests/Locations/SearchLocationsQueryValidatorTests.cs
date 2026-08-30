@@ -33,4 +33,12 @@ public class SearchLocationsQueryValidatorTests
 
         Assert.False(result.IsValid);
     }
+
+    [Fact]
+    public void Validate_Fails_ForQueryExceedingMaximumLength()
+    {
+        var result = _validator.Validate(new SearchLocationsQuery(new string('a', 201)));
+
+        Assert.False(result.IsValid);
+    }
 }

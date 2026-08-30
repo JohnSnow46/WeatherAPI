@@ -11,7 +11,7 @@ public sealed class SearchLocationsQueryValidator : AbstractValidator<SearchLoca
 {
     public SearchLocationsQueryValidator()
     {
-        RuleFor(x => x.Query).NotEmpty();
+        RuleFor(x => x.Query).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Count).InclusiveBetween(1, 20);
     }
 }
