@@ -23,4 +23,16 @@ public class GetForecastQueryValidatorTests
 
         Assert.False(result.IsValid);
     }
+
+    [Theory]
+    [InlineData(-90.1, 0)]
+    [InlineData(90.1, 0)]
+    [InlineData(0, -180.1)]
+    [InlineData(0, 180.1)]
+    public void Validate_Fails_ForOutOfRangeCoordinates(double lat, double lon)
+    {
+        var result = _validator.Validate(new GetForecastQuery(lat, lon, 7));
+
+        Assert.False(result.IsValid);
+    }
 }
