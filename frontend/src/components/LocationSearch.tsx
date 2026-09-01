@@ -18,11 +18,11 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
 
   useEffect(() => {
     const trimmed = query.trim();
-    // Stale results/errors from a previous longer query are harmless here:
-    // the dropdown below only renders when the query is long enough anyway.
     if (trimmed.length < 2) {
       return;
     }
+
+    let ignore = false;
 
     const timeoutId = setTimeout(() => {
       setIsSearching(true);
@@ -30,16 +30,32 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
 
       searchLocations(trimmed)
         .then((locations) => {
+          // Guards against out-of-order responses: a slower request for an
+          // earlier query could otherwise resolve after a faster one for a
+          // later query and overwrite its fresher results.
+          if (ignore) {
+            return;
+          }
           setResults(locations);
           setIsOpen(true);
         })
         .catch((err: unknown) => {
+          if (ignore) {
+            return;
+          }
           setError(err instanceof ApiError ? err.message : "Search failed. Please try again.");
         })
-        .finally(() => setIsSearching(false));
+        .finally(() => {
+          if (!ignore) {
+            setIsSearching(false);
+          }
+        });
     }, DEBOUNCE_MS);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      ignore = true;
+      clearTimeout(timeoutId);
+    };
   }, [query]);
 
   return (
