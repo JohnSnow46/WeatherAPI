@@ -40,7 +40,12 @@ export function WeatherDashboard() {
     if (hasAppliedDefault.current) {
       return;
     }
-    const alreadyStored = window.localStorage.getItem(STORAGE_KEY);
+    let alreadyStored: string | null = null;
+    try {
+      alreadyStored = window.localStorage.getItem(STORAGE_KEY);
+    } catch {
+      // Storage unavailable (private browsing, quota, disabled) — fall through to default.
+    }
     if (alreadyStored) {
       return;
     }

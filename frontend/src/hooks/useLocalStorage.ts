@@ -15,7 +15,14 @@ function getServerSnapshot() {
 // to read an external store during render, with no SSR/hydration mismatch
 // and no synchronous setState-in-effect).
 export function useLocalStorage<T>(key: string): readonly [T | null, (next: T | null) => void] {
-  const getSnapshot = useCallback(() => window.localStorage.getItem(key), [key]);
+  const getSnapshot = useCallback(() => {
+    try {
+      return window.localStorage.getItem(key);
+    } catch {
+      // Storage unavailable (private browsing, quota, disabled) — treat as empty.
+      return null;
+    }
+  }, [key]);
   const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   let value: T | null = null;
