@@ -11,8 +11,8 @@ public sealed class WeatherController(IMediator mediator) : ControllerBase
 {
     [HttpGet("current")]
     public async Task<ActionResult<CurrentWeatherDto>> Current(
-        [FromQuery] double lat,
-        [FromQuery] double lon,
+        [FromQuery] double? lat,
+        [FromQuery] double? lon,
         CancellationToken cancellationToken = default)
     {
         var result = await mediator.Send(new GetCurrentWeatherQuery(lat, lon), cancellationToken);
@@ -21,8 +21,8 @@ public sealed class WeatherController(IMediator mediator) : ControllerBase
 
     [HttpGet("forecast")]
     public async Task<ActionResult<ForecastDto>> Forecast(
-        [FromQuery] double lat,
-        [FromQuery] double lon,
+        [FromQuery] double? lat,
+        [FromQuery] double? lon,
         [FromQuery] int days = 7,
         CancellationToken cancellationToken = default)
     {

@@ -35,4 +35,15 @@ public class GetForecastQueryValidatorTests
 
         Assert.False(result.IsValid);
     }
+
+    [Theory]
+    [InlineData(null, 17.03)]
+    [InlineData(51.11, null)]
+    [InlineData(null, null)]
+    public void Validate_Fails_ForMissingCoordinates(double? lat, double? lon)
+    {
+        var result = _validator.Validate(new GetForecastQuery(lat, lon, 7));
+
+        Assert.False(result.IsValid);
+    }
 }
