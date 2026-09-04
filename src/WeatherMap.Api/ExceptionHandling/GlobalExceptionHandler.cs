@@ -14,6 +14,14 @@ public sealed class GlobalExceptionHandler(
         Exception exception,
         CancellationToken cancellationToken)
     {
+        if (exception is OperationCanceledException && httpContext.RequestAborted.IsCancellationRequested)
+        {
+            // The client disconnected or cancelled the request (e.g. a search-as-you-type
+            // call superseded by a newer keystroke) — not an upstream failure, and there's
+            // no connection left to write a response to.
+            return true;
+        }
+
         var problemDetails = exception switch
         {
             ValidationException validationException => new ProblemDetails
