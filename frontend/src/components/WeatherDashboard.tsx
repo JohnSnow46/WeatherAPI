@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import type { LocationDto } from "@/lib/api";
-import { DEFAULT_LOCATION, type SelectedLocation } from "@/lib/location";
+import { DEFAULT_LOCATION, isValidSelectedLocation, type SelectedLocation } from "@/lib/location";
 import { LocationSearch } from "@/components/LocationSearch";
 import { CurrentWeatherCard } from "@/components/CurrentWeatherCard";
 import { ForecastPanel } from "@/components/ForecastPanel";
@@ -24,29 +24,37 @@ function formatSearchLabel(location: LocationDto): string {
 }
 
 export function WeatherDashboard() {
-  const [selected, setSelected] = useLocalStorage<SelectedLocation>(STORAGE_KEY);
+  const [storedLocation, setSelected] = useLocalStorage<SelectedLocation>(STORAGE_KEY);
+  // Guard against a corrupted/malformed stored value (manual tampering, a
+  // browser extension, or a future incompatible schema change) reaching
+  // Leaflet or the API as garbage — treat it the same as nothing being
+  // stored rather than trusting it as-is.
+  const selected = storedLocation && isValidSelectedLocation(storedLocation) ? storedLocation : null;
   const geolocation = useGeolocation();
   const hasAppliedDefault = useRef(false);
 
-  // Fall back to a fixed default on first visit rather than auto-prompting
-  // for browser geolocation — asking for that permission the moment the
-  // page loads reads as pushy. Reads localStorage directly here (rather
-  // than trusting the `selected` value from useLocalStorage) because on
-  // the very first client render `selected` can still reflect the
-  // SSR-safe `null` snapshot — useSyncExternalStore only resolves the
-  // real value a render later. Trusting that transient `null` would
-  // overwrite an already-persisted location once this effect runs.
+  // Fall back to a fixed default on first visit (or when the stored value
+  // is missing/corrupted) rather than auto-prompting for browser
+  // geolocation — asking for that permission the moment the page loads
+  // reads as pushy. Reads localStorage directly here (rather than trusting
+  // the `selected` value from useLocalStorage) because on the very first
+  // client render `selected` can still reflect the SSR-safe `null`
+  // snapshot — useSyncExternalStore only resolves the real value a render
+  // later. Trusting that transient `null` would overwrite an
+  // already-persisted location once this effect runs.
   useEffect(() => {
     if (hasAppliedDefault.current) {
       return;
     }
-    let alreadyStored: string | null = null;
+    let hasValidStoredLocation = false;
     try {
-      alreadyStored = window.localStorage.getItem(STORAGE_KEY);
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      hasValidStoredLocation = raw !== null && isValidSelectedLocation(JSON.parse(raw));
     } catch {
-      // Storage unavailable (private browsing, quota, disabled) — fall through to default.
+      // Storage unavailable (private browsing, quota, disabled), or the
+      // stored value is malformed JSON — fall through to default.
     }
-    if (alreadyStored) {
+    if (hasValidStoredLocation) {
       return;
     }
     hasAppliedDefault.current = true;
