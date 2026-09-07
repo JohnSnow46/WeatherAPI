@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\WeatherMap.Domain\WeatherMap.Domain.csproj" />
     <ProjectReference Include="..\..\src\WeatherMap.Application\WeatherMap.Application.csproj" />
+    <ProjectReference Include="..\..\src\WeatherMap.Infrastructure\WeatherMap.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

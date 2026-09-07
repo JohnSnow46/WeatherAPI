@@ -31,28 +31,32 @@ public static class DependencyInjection
                 client.BaseAddress = new Uri(openMeteoOptions.GeocodingBaseUrl);
             })
             .AddPolicyHandler(PollyPolicies.GetRetryPolicy())
-            .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy());
+            .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy())
+            .AddPolicyHandler(PollyPolicies.GetTimeoutPolicy());
 
         services.AddHttpClient<OpenMeteoForecastClient>(client =>
             {
                 client.BaseAddress = new Uri(openMeteoOptions.ForecastBaseUrl);
             })
             .AddPolicyHandler(PollyPolicies.GetRetryPolicy())
-            .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy());
+            .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy())
+            .AddPolicyHandler(PollyPolicies.GetTimeoutPolicy());
 
         services.AddHttpClient<RainViewerClient>(client =>
             {
                 client.BaseAddress = new Uri("https://api.rainviewer.com/");
             })
             .AddPolicyHandler(PollyPolicies.GetRetryPolicy())
-            .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy());
+            .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy())
+            .AddPolicyHandler(PollyPolicies.GetTimeoutPolicy());
 
         services.AddHttpClient<OpenWeatherMapTileClient>(client =>
             {
                 client.BaseAddress = new Uri(openWeatherMapOptions.BaseUrl);
             })
             .AddPolicyHandler(PollyPolicies.GetRetryPolicy())
-            .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy());
+            .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy())
+            .AddPolicyHandler(PollyPolicies.GetTimeoutPolicy());
 
         services.AddScoped<IGeocodingClient, CachedGeocodingClient>();
         services.AddScoped<IWeatherClient, CachedWeatherClient>();

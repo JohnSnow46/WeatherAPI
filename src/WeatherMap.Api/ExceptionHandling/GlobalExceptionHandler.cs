@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Polly.CircuitBreaker;
+using Polly.Timeout;
 
 namespace WeatherMap.Api.ExceptionHandling;
 
@@ -36,7 +37,7 @@ public sealed class GlobalExceptionHandler(
                         .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()),
                 },
             },
-            BrokenCircuitException or HttpRequestException or TaskCanceledException => new ProblemDetails
+            BrokenCircuitException or HttpRequestException or TaskCanceledException or TimeoutRejectedException => new ProblemDetails
             {
                 Status = StatusCodes.Status503ServiceUnavailable,
                 Title = "Upstream weather provider unavailable",

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
+using Polly.Timeout;
 using WeatherMap.Api.ExceptionHandling;
 
 namespace WeatherMap.IntegrationTests.ExceptionHandling;
@@ -30,6 +31,18 @@ public class GlobalExceptionHandlerTests
         var handler = new GlobalExceptionHandler(problemDetailsService, NullLogger<GlobalExceptionHandler>.Instance);
 
         await handler.TryHandleAsync(httpContext, new TaskCanceledException(), CancellationToken.None);
+
+        Assert.Equal(StatusCodes.Status503ServiceUnavailable, httpContext.Response.StatusCode);
+    }
+
+    [Fact]
+    public async Task TryHandleAsync_ReturnsServiceUnavailable_WhenAnUpstreamCallTimesOut()
+    {
+        var httpContext = new DefaultHttpContext();
+        var problemDetailsService = new RecordingProblemDetailsService();
+        var handler = new GlobalExceptionHandler(problemDetailsService, NullLogger<GlobalExceptionHandler>.Instance);
+
+        await handler.TryHandleAsync(httpContext, new TimeoutRejectedException(), CancellationToken.None);
 
         Assert.Equal(StatusCodes.Status503ServiceUnavailable, httpContext.Response.StatusCode);
     }
