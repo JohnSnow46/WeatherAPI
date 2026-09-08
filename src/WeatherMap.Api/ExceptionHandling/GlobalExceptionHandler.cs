@@ -51,7 +51,11 @@ public sealed class GlobalExceptionHandler(
             },
         };
 
-        logger.LogError(exception, "Request failed with {Title}", problemDetails.Title);
+        // Client input mistakes (400) are expected traffic, not operational failures —
+        // logging them at Error level would drown real upstream/server issues in noise
+        // (and could trip Error-based alerting on nothing more than a bad query string).
+        var logLevel = problemDetails.Status == StatusCodes.Status400BadRequest ? LogLevel.Warning : LogLevel.Error;
+        logger.Log(logLevel, exception, "Request failed with {Title}", problemDetails.Title);
 
         httpContext.Response.StatusCode = problemDetails.Status!.Value;
 
