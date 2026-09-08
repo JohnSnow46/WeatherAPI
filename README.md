@@ -121,7 +121,7 @@ dotnet run --project src/WeatherMap.Api
 ```
 
 The map's wind/clouds/pressure/temperature layers need a free OpenWeatherMap API key
-(open-meteo and RainViewer need none). Sign up at
+(Open-Meteo and RainViewer need none). Sign up at
 [openweathermap.org](https://openweathermap.org/), then set the key locally without
 committing it:
 
