@@ -48,4 +48,14 @@ public class GetMapTileQueryValidatorTests
 
         Assert.True(result.IsValid);
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(19)]
+    public void Validate_Succeeds_ForBoundaryZoomLevels(int z)
+    {
+        var result = _validator.Validate(new GetMapTileQuery("wind_new", z, 0, 0));
+
+        Assert.True(result.IsValid);
+    }
 }
