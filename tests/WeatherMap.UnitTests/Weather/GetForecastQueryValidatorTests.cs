@@ -25,6 +25,16 @@ public class GetForecastQueryValidatorTests
     }
 
     [Theory]
+    [InlineData(1)]
+    [InlineData(16)]
+    public void Validate_Succeeds_ForDaysBoundaryValues(int days)
+    {
+        var result = _validator.Validate(new GetForecastQuery(51.11, 17.03, days));
+
+        Assert.True(result.IsValid);
+    }
+
+    [Theory]
     [InlineData(-90.1, 0)]
     [InlineData(90.1, 0)]
     [InlineData(0, -180.1)]
@@ -34,6 +44,18 @@ public class GetForecastQueryValidatorTests
         var result = _validator.Validate(new GetForecastQuery(lat, lon, 7));
 
         Assert.False(result.IsValid);
+    }
+
+    [Theory]
+    [InlineData(-90, 0)]
+    [InlineData(90, 0)]
+    [InlineData(0, -180)]
+    [InlineData(0, 180)]
+    public void Validate_Succeeds_ForBoundaryCoordinates(double lat, double lon)
+    {
+        var result = _validator.Validate(new GetForecastQuery(lat, lon, 7));
+
+        Assert.True(result.IsValid);
     }
 
     [Theory]
