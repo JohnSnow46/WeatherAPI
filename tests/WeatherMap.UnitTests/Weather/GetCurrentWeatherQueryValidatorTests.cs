@@ -27,6 +27,18 @@ public class GetCurrentWeatherQueryValidatorTests
     }
 
     [Theory]
+    [InlineData(-90, 0)]
+    [InlineData(90, 0)]
+    [InlineData(0, -180)]
+    [InlineData(0, 180)]
+    public void Validate_Succeeds_ForBoundaryCoordinates(double lat, double lon)
+    {
+        var result = _validator.Validate(new GetCurrentWeatherQuery(lat, lon));
+
+        Assert.True(result.IsValid);
+    }
+
+    [Theory]
     [InlineData(null, 17.03)]
     [InlineData(51.11, null)]
     [InlineData(null, null)]
