@@ -47,6 +47,14 @@ public sealed class OpenMeteoForecastClient(HttpClient httpClient) : IWeatherCli
             ?? throw new InvalidOperationException("Open-Meteo returned an empty forecast response.");
 
         var hourly = response.Hourly;
+        if (hourly.Temperature2m.Count != hourly.Time.Count
+            || hourly.Precipitation.Count != hourly.Time.Count
+            || hourly.WindSpeed10m.Count != hourly.Time.Count
+            || hourly.WeatherCode.Count != hourly.Time.Count)
+        {
+            throw new InvalidOperationException("Open-Meteo returned mismatched hourly forecast array lengths.");
+        }
+
         var hourlyPoints = hourly.Time
             .Select((time, i) => new HourlyForecastPoint(
                 ParseLocalTime(time, response.UtcOffsetSeconds),
@@ -57,6 +65,14 @@ public sealed class OpenMeteoForecastClient(HttpClient httpClient) : IWeatherCli
             .ToList();
 
         var daily = response.Daily;
+        if (daily.Temperature2mMax.Count != daily.Time.Count
+            || daily.Temperature2mMin.Count != daily.Time.Count
+            || daily.PrecipitationSum.Count != daily.Time.Count
+            || daily.WeatherCode.Count != daily.Time.Count)
+        {
+            throw new InvalidOperationException("Open-Meteo returned mismatched daily forecast array lengths.");
+        }
+
         var dailyPoints = daily.Time
             .Select((date, i) => new DailyForecastPoint(
                 DateOnly.Parse(date, CultureInfo.InvariantCulture),
