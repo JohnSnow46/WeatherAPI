@@ -34,11 +34,29 @@ public class SearchLocationsQueryValidatorTests
         Assert.False(result.IsValid);
     }
 
+    [Theory]
+    [InlineData(1)]
+    [InlineData(20)]
+    public void Validate_Succeeds_ForBoundaryCount(int count)
+    {
+        var result = _validator.Validate(new SearchLocationsQuery("Wroclaw", count));
+
+        Assert.True(result.IsValid);
+    }
+
     [Fact]
     public void Validate_Fails_ForQueryExceedingMaximumLength()
     {
         var result = _validator.Validate(new SearchLocationsQuery(new string('a', 201)));
 
         Assert.False(result.IsValid);
+    }
+
+    [Fact]
+    public void Validate_Succeeds_ForQueryAtMaximumLength()
+    {
+        var result = _validator.Validate(new SearchLocationsQuery(new string('a', 200)));
+
+        Assert.True(result.IsValid);
     }
 }
