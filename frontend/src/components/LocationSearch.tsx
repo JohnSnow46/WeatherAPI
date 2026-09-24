@@ -79,6 +79,10 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
         onFocus={() => results.length > 0 && setIsOpen(true)}
         onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         placeholder="Search for a city…"
+        // Mirrors SearchLocationsQueryValidator's MaximumLength(200) on the
+        // backend, so pasting an overlong string is rejected in the UI
+        // instead of round-tripping to the API only to fail validation.
+        maxLength={200}
         className="w-full rounded-full bg-transparent py-2 pl-10 pr-4 text-sm text-ink-primary outline-none placeholder:text-ink-muted"
       />
 
