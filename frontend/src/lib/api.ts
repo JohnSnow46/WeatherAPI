@@ -57,8 +57,14 @@ type ProblemDetails = {
   errors?: Record<string, string[]>;
 };
 
+// Mirrors the backend's own Polly timeout policy (10s per upstream attempt,
+// see PollyPolicies.GetTimeoutPolicy) — without this, `fetch` has no default
+// timeout at all, so a hung backend request would leave the UI stuck on its
+// loading state indefinitely instead of surfacing an error.
+const REQUEST_TIMEOUT_MS = 15_000;
+
 async function apiFetch<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`);
+  const response = await fetch(`${API_BASE_URL}${path}`, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 
   if (!response.ok) {
     const problem: ProblemDetails | null = await response.json().catch(() => null);

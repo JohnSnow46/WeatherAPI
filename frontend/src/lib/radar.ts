@@ -11,8 +11,16 @@ export type RadarInfoDto = {
   nowcast: RadarFrameDto[];
 };
 
+// Mirrors the backend's own Polly timeout policy (10s per upstream attempt,
+// see PollyPolicies.GetTimeoutPolicy) — without this, `fetch` has no default
+// timeout at all, so a hung backend request would leave the radar overlay
+// pending indefinitely instead of just being omitted from the map.
+const REQUEST_TIMEOUT_MS = 15_000;
+
 export async function getRadarInfo(): Promise<RadarInfoDto> {
-  const response = await fetch(`${API_BASE_URL}/api/weather/radar-tiles`);
+  const response = await fetch(`${API_BASE_URL}/api/weather/radar-tiles`, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
 
   if (!response.ok) {
     throw new Error(`Failed to load radar info (status ${response.status}).`);
