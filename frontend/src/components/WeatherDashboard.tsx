@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useUnitPreference } from "@/hooks/useUnitPreference";
 import type { LocationDto } from "@/lib/api";
 import { DEFAULT_LOCATION, isValidSelectedLocation, type SelectedLocation } from "@/lib/location";
 import { LocationSearch } from "@/components/LocationSearch";
@@ -31,6 +32,7 @@ export function WeatherDashboard() {
   // stored rather than trusting it as-is.
   const selected = storedLocation && isValidSelectedLocation(storedLocation) ? storedLocation : null;
   const geolocation = useGeolocation();
+  const [unit, setUnit] = useUnitPreference();
   const hasAppliedDefault = useRef(false);
 
   // Fall back to a fixed default on first visit (or when the stored value
@@ -92,6 +94,14 @@ export function WeatherDashboard() {
         >
           Use my location
         </button>
+        <button
+          type="button"
+          onClick={() => setUnit(unit === "imperial" ? "metric" : "imperial")}
+          className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-accent/10 hover:text-accent"
+          aria-label="Toggle between metric and imperial units"
+        >
+          {unit === "imperial" ? "°F" : "°C"}
+        </button>
       </div>
 
       {geolocation.state.status === "loading" && (
@@ -104,8 +114,8 @@ export function WeatherDashboard() {
 
       {selected && (
         <div className="flex w-full flex-col items-center gap-6">
-          <CurrentWeatherCard location={selected} />
-          <ForecastPanel location={selected} />
+          <CurrentWeatherCard location={selected} unit={unit} />
+          <ForecastPanel location={selected} unit={unit} />
           <WeatherMap location={selected} />
         </div>
       )}

@@ -4,14 +4,40 @@ import { useQuery } from "@tanstack/react-query";
 import { ApiError, getCurrentWeather } from "@/lib/api";
 import { describeWeatherCode } from "@/lib/weatherCodes";
 import type { SelectedLocation } from "@/lib/location";
+import {
+  precipitationUnitLabel,
+  speedUnitLabel,
+  temperatureUnitLabel,
+  toDisplayPrecipitation,
+  toDisplaySpeed,
+  toDisplayTemperature,
+  type UnitSystem,
+} from "@/lib/units";
 
 const STAT_TILES = [
-  { key: "apparentTemperatureC" as const, icon: "🌡️", label: "Feels like", format: (v: number) => `${Math.round(v)}°C` },
-  { key: "windSpeedKmh" as const, icon: "💨", label: "Wind", format: (v: number) => `${Math.round(v)} km/h` },
-  { key: "precipitationMm" as const, icon: "💧", label: "Precipitation", format: (v: number) => `${v.toFixed(1)} mm` },
+  {
+    key: "apparentTemperatureC" as const,
+    icon: "🌡️",
+    label: "Feels like",
+    format: (v: number, unit: UnitSystem) =>
+      `${Math.round(toDisplayTemperature(v, unit))}${temperatureUnitLabel(unit)}`,
+  },
+  {
+    key: "windSpeedKmh" as const,
+    icon: "💨",
+    label: "Wind",
+    format: (v: number, unit: UnitSystem) => `${Math.round(toDisplaySpeed(v, unit))} ${speedUnitLabel(unit)}`,
+  },
+  {
+    key: "precipitationMm" as const,
+    icon: "💧",
+    label: "Precipitation",
+    format: (v: number, unit: UnitSystem) =>
+      `${toDisplayPrecipitation(v, unit).toFixed(unit === "imperial" ? 2 : 1)} ${precipitationUnitLabel(unit)}`,
+  },
 ];
 
-export function CurrentWeatherCard({ location }: { location: SelectedLocation }) {
+export function CurrentWeatherCard({ location, unit }: { location: SelectedLocation; unit: UnitSystem }) {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["current-weather", location.latitude, location.longitude],
     queryFn: () => getCurrentWeather(location.latitude, location.longitude),
@@ -40,7 +66,7 @@ export function CurrentWeatherCard({ location }: { location: SelectedLocation })
                 </span>
                 <div>
                   <p className="text-6xl font-semibold tracking-tight text-ink-primary">
-                    {Math.round(data.temperatureC)}°
+                    {Math.round(toDisplayTemperature(data.temperatureC, unit))}°
                   </p>
                   <p className="text-sm text-ink-secondary">{label}</p>
                 </div>
@@ -55,7 +81,7 @@ export function CurrentWeatherCard({ location }: { location: SelectedLocation })
                   <span aria-hidden>{icon}</span>
                   {label}
                 </dt>
-                <dd className="mt-0.5 font-medium text-ink-primary">{format(data[key])}</dd>
+                <dd className="mt-0.5 font-medium text-ink-primary">{format(data[key], unit)}</dd>
               </div>
             ))}
             <div>

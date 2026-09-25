@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ApiError, getForecast } from "@/lib/api";
 import { describeWeatherCode } from "@/lib/weatherCodes";
 import type { SelectedLocation } from "@/lib/location";
+import { toDisplayTemperature, type UnitSystem } from "@/lib/units";
 
 const HOURLY_POINTS_SHOWN = 24;
 
@@ -24,7 +25,7 @@ function formatWeekday(isoDate: string): string {
   });
 }
 
-export function ForecastPanel({ location }: { location: SelectedLocation }) {
+export function ForecastPanel({ location, unit }: { location: SelectedLocation; unit: UnitSystem }) {
   // Lazy initializer: runs once on mount rather than on every render, so
   // "upcoming" filtering below doesn't call an impure function during render.
   const [now] = useState(() => Date.now());
@@ -70,7 +71,9 @@ export function ForecastPanel({ location }: { location: SelectedLocation }) {
                 <span className="text-xl" aria-hidden>
                   {icon}
                 </span>
-                <span className="text-sm font-medium text-ink-primary">{Math.round(point.temperatureC)}°</span>
+                <span className="text-sm font-medium text-ink-primary">
+                  {Math.round(toDisplayTemperature(point.temperatureC, unit))}°
+                </span>
               </div>
             );
           })}
@@ -92,9 +95,11 @@ export function ForecastPanel({ location }: { location: SelectedLocation }) {
                   {icon}
                 </span>
                 <span className="text-sm text-ink-secondary">
-                  <span className="font-medium text-ink-primary">{Math.round(point.tempMaxC)}°</span>
+                  <span className="font-medium text-ink-primary">
+                    {Math.round(toDisplayTemperature(point.tempMaxC, unit))}°
+                  </span>
                   {" / "}
-                  {Math.round(point.tempMinC)}°
+                  {Math.round(toDisplayTemperature(point.tempMinC, unit))}°
                 </span>
               </div>
             );
