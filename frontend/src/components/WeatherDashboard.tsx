@@ -10,6 +10,7 @@ import { DEFAULT_LOCATION, isValidSelectedLocation, type SelectedLocation } from
 import { LocationSearch } from "@/components/LocationSearch";
 import { CurrentWeatherCard } from "@/components/CurrentWeatherCard";
 import { ForecastPanel } from "@/components/ForecastPanel";
+import { FavoriteLocations } from "@/components/FavoriteLocations";
 
 // Leaflet touches `window` at import time, so it can't be prerendered on the
 // server even inside a "use client" file — load it client-only.
@@ -103,6 +104,11 @@ export function WeatherDashboard() {
           {unit === "imperial" ? "°F" : "°C"}
         </button>
       </div>
+
+      <FavoriteLocations
+        selected={selected}
+        onSelect={(location) => setSelected(location)}
+      />
 
       {geolocation.state.status === "loading" && (
         <p className="text-sm text-ink-secondary">Requesting your location…</p>
