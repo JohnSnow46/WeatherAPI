@@ -11,6 +11,7 @@ import { LocationSearch } from "@/components/LocationSearch";
 import { CurrentWeatherCard } from "@/components/CurrentWeatherCard";
 import { ForecastPanel } from "@/components/ForecastPanel";
 import { FavoriteLocations } from "@/components/FavoriteLocations";
+import { FavoritesComparisonGrid } from "@/components/FavoritesComparisonGrid";
 import { WeatherAlertBanner } from "@/components/WeatherAlertBanner";
 
 // Leaflet touches `window` at import time, so it can't be prerendered on the
@@ -110,6 +111,7 @@ export function WeatherDashboard() {
         selected={selected}
         onSelect={(location) => setSelected(location)}
       />
+      <FavoritesComparisonGrid unit={unit} />
 
       {geolocation.state.status === "loading" && (
         <p className="text-sm text-ink-secondary">Requesting your location…</p>
