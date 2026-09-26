@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using WeatherMap.Domain.Abstractions;
 using WeatherMap.Domain.Models;
+using WeatherMap.Infrastructure.Caching;
 using WeatherMap.Infrastructure.Options;
 
 namespace WeatherMap.Infrastructure.Weather;
@@ -10,11 +11,13 @@ namespace WeatherMap.Infrastructure.Weather;
 public sealed class CachedWeatherClient(
     OpenMeteoForecastClient inner,
     IMemoryCache cache,
-    IOptions<CacheOptions> cacheOptions) : IWeatherClient
+    IOptions<CacheOptions> cacheOptions,
+    CacheMetrics metrics) : IWeatherClient
 {
     public Task<CurrentConditions> GetCurrentAsync(double latitude, double longitude, CancellationToken cancellationToken)
     {
         var cacheKey = $"current:{Round(latitude)}:{Round(longitude)}";
+        metrics.RecordLookup(cache, cacheKey);
 
         return cache.GetOrCreateAsync(cacheKey, entry =>
         {
@@ -26,6 +29,7 @@ public sealed class CachedWeatherClient(
     public Task<Forecast> GetForecastAsync(double latitude, double longitude, int days, CancellationToken cancellationToken)
     {
         var cacheKey = $"forecast:{Round(latitude)}:{Round(longitude)}:{days}";
+        metrics.RecordLookup(cache, cacheKey);
 
         return cache.GetOrCreateAsync(cacheKey, entry =>
         {

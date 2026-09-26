@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WeatherMap.Domain.Abstractions;
+using WeatherMap.Infrastructure.Caching;
 using WeatherMap.Infrastructure.Geocoding;
 using WeatherMap.Infrastructure.HealthChecks;
 using WeatherMap.Infrastructure.MapTiles;
@@ -16,6 +17,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMemoryCache();
+        services.AddSingleton<CacheMetrics>();
 
         services.Configure<OpenMeteoOptions>(configuration.GetSection(OpenMeteoOptions.SectionName));
         services.Configure<CacheOptions>(configuration.GetSection(CacheOptions.SectionName));
@@ -65,7 +67,8 @@ public static class DependencyInjection
 
         services.AddHealthChecks()
             .AddCheck<OpenMeteoHealthCheck>("open-meteo", tags: ["external"])
-            .AddCheck<RainViewerHealthCheck>("rainviewer", tags: ["external"]);
+            .AddCheck<RainViewerHealthCheck>("rainviewer", tags: ["external"])
+            .AddCheck<CacheHealthCheck>("cache", tags: ["cache"]);
 
         return services;
     }

@@ -1,5 +1,7 @@
 using System.Net;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using WeatherMap.Infrastructure.Caching;
 using WeatherMap.Infrastructure.HealthChecks;
 using WeatherMap.Infrastructure.Radar;
 using WeatherMap.Infrastructure.Weather;
@@ -95,5 +97,38 @@ public class HealthCheckTests
         var result = await check.CheckHealthAsync(new HealthCheckContext());
 
         Assert.Equal(HealthStatus.Healthy, result.Status);
+    }
+
+    [Fact]
+    public async Task CacheHealthCheck_WithNoLookupsYet_ReportsNotApplicableHitRate()
+    {
+        var check = new CacheHealthCheck(new CacheMetrics());
+
+        var result = await check.CheckHealthAsync(new HealthCheckContext());
+
+        Assert.Equal(HealthStatus.Healthy, result.Status);
+        Assert.Equal(0L, result.Data["hits"]);
+        Assert.Equal(0L, result.Data["misses"]);
+        Assert.Equal("n/a", result.Data["hitRate"]);
+    }
+
+    [Fact]
+    public async Task CacheHealthCheck_AfterHitsAndMisses_ReportsHitRate()
+    {
+        var metrics = new CacheMetrics();
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        cache.Set("known-key", "value");
+
+        metrics.RecordLookup(cache, "known-key");
+        metrics.RecordLookup(cache, "known-key");
+        metrics.RecordLookup(cache, "missing-key");
+
+        var check = new CacheHealthCheck(metrics);
+        var result = await check.CheckHealthAsync(new HealthCheckContext());
+
+        Assert.Equal(HealthStatus.Healthy, result.Status);
+        Assert.Equal(2L, result.Data["hits"]);
+        Assert.Equal(1L, result.Data["misses"]);
+        Assert.Equal("66.7%", result.Data["hitRate"]);
     }
 }

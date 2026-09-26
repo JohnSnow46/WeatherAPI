@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using WeatherMap.Infrastructure.Caching;
 using WeatherMap.Infrastructure.Options;
 using WeatherMap.Infrastructure.Radar;
 
@@ -45,7 +46,7 @@ public class CachedRadarClientTests
         var inner = new RainViewerClient(httpClient);
         var cache = new MemoryCache(new MemoryCacheOptions());
         var options = Options.Create(new CacheOptions());
-        return new CachedRadarClient(inner, cache, options);
+        return new CachedRadarClient(inner, cache, options, new CacheMetrics());
     }
 
     [Fact]

@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using WeatherMap.Infrastructure.Caching;
 using WeatherMap.Infrastructure.Options;
 using WeatherMap.Infrastructure.Weather;
 
@@ -68,7 +69,7 @@ public class CachedWeatherClientTests
         var inner = new OpenMeteoForecastClient(httpClient);
         var cache = new MemoryCache(new MemoryCacheOptions());
         var options = Options.Create(new CacheOptions());
-        return new CachedWeatherClient(inner, cache, options);
+        return new CachedWeatherClient(inner, cache, options, new CacheMetrics());
     }
 
     [Fact]

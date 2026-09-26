@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using WeatherMap.Infrastructure.Caching;
 using WeatherMap.Infrastructure.Geocoding;
 using WeatherMap.Infrastructure.Options;
 
@@ -36,7 +37,7 @@ public class CachedGeocodingClientTests
         var inner = new OpenMeteoGeocodingClient(httpClient);
         var cache = new MemoryCache(new MemoryCacheOptions());
         var options = Options.Create(new CacheOptions());
-        return new CachedGeocodingClient(inner, cache, options);
+        return new CachedGeocodingClient(inner, cache, options, new CacheMetrics());
     }
 
     [Fact]

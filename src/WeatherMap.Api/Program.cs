@@ -67,6 +67,7 @@ static Task WriteHealthCheckResponseAsync(HttpContext context, HealthReport repo
             status = e.Value.Status.ToString(),
             description = e.Value.Description,
             durationMs = e.Value.Duration.TotalMilliseconds,
+            data = e.Value.Data.Count > 0 ? e.Value.Data : null,
         }),
     };
 

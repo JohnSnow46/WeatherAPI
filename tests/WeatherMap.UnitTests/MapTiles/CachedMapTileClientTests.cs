@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using WeatherMap.Infrastructure.Caching;
 using WeatherMap.Infrastructure.MapTiles;
 using WeatherMap.Infrastructure.Options;
 
@@ -32,7 +33,7 @@ public class CachedMapTileClientTests
         var inner = new OpenWeatherMapTileClient(httpClient, Options.Create(new OpenWeatherMapOptions { ApiKey = "test-key" }));
         var cache = new MemoryCache(new MemoryCacheOptions());
         var options = Options.Create(new CacheOptions());
-        return new CachedMapTileClient(inner, cache, options);
+        return new CachedMapTileClient(inner, cache, options, new CacheMetrics());
     }
 
     [Fact]
