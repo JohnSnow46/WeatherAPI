@@ -11,6 +11,7 @@ import { LocationSearch } from "@/components/LocationSearch";
 import { CurrentWeatherCard } from "@/components/CurrentWeatherCard";
 import { ForecastPanel } from "@/components/ForecastPanel";
 import { FavoriteLocations } from "@/components/FavoriteLocations";
+import { WeatherAlertBanner } from "@/components/WeatherAlertBanner";
 
 // Leaflet touches `window` at import time, so it can't be prerendered on the
 // server even inside a "use client" file — load it client-only.
@@ -120,6 +121,7 @@ export function WeatherDashboard() {
 
       {selected && (
         <div className="flex w-full flex-col items-center gap-6">
+          <WeatherAlertBanner location={selected} />
           <CurrentWeatherCard location={selected} unit={unit} />
           <ForecastPanel location={selected} unit={unit} />
           <WeatherMap location={selected} />
