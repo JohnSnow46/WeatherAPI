@@ -41,6 +41,13 @@ export type ForecastDto = {
   daily: DailyForecastPointDto[];
 };
 
+export type AirQualityDto = {
+  time: string;
+  pm2_5: number;
+  pm10: number;
+  europeanAqi: number;
+};
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -88,6 +95,11 @@ export function getCurrentWeather(latitude: number, longitude: number): Promise<
 export function getForecast(latitude: number, longitude: number, days = 5): Promise<ForecastDto> {
   const params = new URLSearchParams({ lat: String(latitude), lon: String(longitude), days: String(days) });
   return apiFetch<ForecastDto>(`/api/weather/forecast?${params.toString()}`);
+}
+
+export function getAirQuality(latitude: number, longitude: number): Promise<AirQualityDto> {
+  const params = new URLSearchParams({ lat: String(latitude), lon: String(longitude) });
+  return apiFetch<AirQualityDto>(`/api/weather/air-quality?${params.toString()}`);
 }
 
 // OpenWeatherMap's Weather Maps 1.0 free-tier layers, proxied through the

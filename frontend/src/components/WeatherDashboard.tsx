@@ -9,6 +9,7 @@ import type { LocationDto } from "@/lib/api";
 import { DEFAULT_LOCATION, isValidSelectedLocation, type SelectedLocation } from "@/lib/location";
 import { LocationSearch } from "@/components/LocationSearch";
 import { CurrentWeatherCard } from "@/components/CurrentWeatherCard";
+import { AirQualityPanel } from "@/components/AirQualityPanel";
 import { ForecastPanel } from "@/components/ForecastPanel";
 import { FavoriteLocations } from "@/components/FavoriteLocations";
 import { FavoritesComparisonGrid } from "@/components/FavoritesComparisonGrid";
@@ -125,6 +126,7 @@ export function WeatherDashboard() {
         <div className="flex w-full flex-col items-center gap-6">
           <WeatherAlertBanner location={selected} />
           <CurrentWeatherCard location={selected} unit={unit} />
+          <AirQualityPanel location={selected} />
           <ForecastPanel location={selected} unit={unit} />
           <WeatherMap location={selected} />
         </div>
