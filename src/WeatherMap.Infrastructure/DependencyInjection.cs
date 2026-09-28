@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WeatherMap.Domain.Abstractions;
+using WeatherMap.Infrastructure.AirQuality;
 using WeatherMap.Infrastructure.Caching;
 using WeatherMap.Infrastructure.Geocoding;
 using WeatherMap.Infrastructure.HealthChecks;
@@ -60,10 +61,19 @@ public static class DependencyInjection
             .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy())
             .AddPolicyHandler(PollyPolicies.GetTimeoutPolicy());
 
+        services.AddHttpClient<OpenMeteoAirQualityClient>(client =>
+            {
+                client.BaseAddress = new Uri(openMeteoOptions.AirQualityBaseUrl);
+            })
+            .AddPolicyHandler(PollyPolicies.GetRetryPolicy())
+            .AddPolicyHandler(PollyPolicies.GetCircuitBreakerPolicy())
+            .AddPolicyHandler(PollyPolicies.GetTimeoutPolicy());
+
         services.AddScoped<IGeocodingClient, CachedGeocodingClient>();
         services.AddScoped<IWeatherClient, CachedWeatherClient>();
         services.AddScoped<IRadarClient, CachedRadarClient>();
         services.AddScoped<IWeatherTileClient, CachedMapTileClient>();
+        services.AddScoped<IAirQualityClient, CachedAirQualityClient>();
 
         services.AddHealthChecks()
             .AddCheck<OpenMeteoHealthCheck>("open-meteo", tags: ["external"])

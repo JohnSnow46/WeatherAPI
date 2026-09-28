@@ -28,4 +28,7 @@ public static class Mapping
 
     public static MapTileDto ToDto(this MapTile tile) =>
         new(tile.Content, tile.ContentType);
+
+    public static AirQualityDto ToDto(this AirQuality airQuality) =>
+        new(airQuality.Time, airQuality.Pm2_5, airQuality.Pm10, airQuality.EuropeanAqi);
 }

@@ -44,3 +44,9 @@ public sealed record RadarInfoDto(
     IReadOnlyList<RadarFrameDto> Nowcast);
 
 public sealed record MapTileDto(byte[] Content, string ContentType);
+
+public sealed record AirQualityDto(
+    DateTimeOffset Time,
+    double Pm2_5,
+    double Pm10,
+    int EuropeanAqi);

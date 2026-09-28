@@ -13,4 +13,6 @@ public sealed class CacheOptions
     public int RadarInfoTtlMinutes { get; set; } = 5;
 
     public int MapTileTtlMinutes { get; set; } = 45;
+
+    public int AirQualityTtlMinutes { get; set; } = 30;
 }

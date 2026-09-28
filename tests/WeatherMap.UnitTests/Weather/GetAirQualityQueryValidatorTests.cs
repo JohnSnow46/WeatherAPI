@@ -1,0 +1,39 @@
+using WeatherMap.Application.Weather;
+
+namespace WeatherMap.UnitTests.Weather;
+
+public class GetAirQualityQueryValidatorTests
+{
+    private readonly GetAirQualityQueryValidator _validator = new();
+
+    [Fact]
+    public void Validate_Succeeds_ForValidCoordinates()
+    {
+        var result = _validator.Validate(new GetAirQualityQuery(51.11, 17.03));
+
+        Assert.True(result.IsValid);
+    }
+
+    [Theory]
+    [InlineData(-90.1, 0)]
+    [InlineData(90.1, 0)]
+    [InlineData(0, -180.1)]
+    [InlineData(0, 180.1)]
+    public void Validate_Fails_ForOutOfRangeCoordinates(double lat, double lon)
+    {
+        var result = _validator.Validate(new GetAirQualityQuery(lat, lon));
+
+        Assert.False(result.IsValid);
+    }
+
+    [Theory]
+    [InlineData(null, 17.03)]
+    [InlineData(51.11, null)]
+    [InlineData(null, null)]
+    public void Validate_Fails_ForMissingCoordinates(double? lat, double? lon)
+    {
+        var result = _validator.Validate(new GetAirQualityQuery(lat, lon));
+
+        Assert.False(result.IsValid);
+    }
+}

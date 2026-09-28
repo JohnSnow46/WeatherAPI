@@ -7,4 +7,6 @@ public sealed class OpenMeteoOptions
     public string GeocodingBaseUrl { get; set; } = "https://geocoding-api.open-meteo.com/";
 
     public string ForecastBaseUrl { get; set; } = "https://api.open-meteo.com/";
+
+    public string AirQualityBaseUrl { get; set; } = "https://air-quality-api.open-meteo.com/";
 }

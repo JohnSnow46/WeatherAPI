@@ -43,4 +43,14 @@ public sealed class WeatherController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(new GetMapTileQuery(layer, z, x, y), cancellationToken);
         return File(result.Content, result.ContentType);
     }
+
+    [HttpGet("air-quality")]
+    public async Task<ActionResult<AirQualityDto>> AirQuality(
+        [FromQuery] double? lat,
+        [FromQuery] double? lon,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(new GetAirQualityQuery(lat, lon), cancellationToken);
+        return Ok(result);
+    }
 }
