@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ApiError, getForecast } from "@/lib/api";
+import { ApiError, getForecast, type ForecastDto } from "@/lib/api";
 import { describeWeatherCode } from "@/lib/weatherCodes";
 import type { SelectedLocation } from "@/lib/location";
 import { toDisplayTemperature, type UnitSystem } from "@/lib/units";
+import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
+import { StaleDataBanner } from "@/components/StaleDataBanner";
 
 const HOURLY_POINTS_SHOWN = 24;
 
@@ -34,12 +36,15 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
     queryKey: ["forecast", location.latitude, location.longitude],
     queryFn: () => getForecast(location.latitude, location.longitude),
   });
+  const cacheKey = locationCacheKey(location.latitude, location.longitude);
+  const fallback = useOfflineFallback<ForecastDto>("forecast", cacheKey, data, isError);
+  const displayData = data ?? fallback?.data;
 
   if (isLoading) {
     return <p className="text-sm text-ink-secondary">Loading forecast…</p>;
   }
 
-  if (isError) {
+  if (isError && !fallback) {
     return (
       <p className="text-sm text-red-500">
         {error instanceof ApiError ? error.message : "Could not load the forecast."}
@@ -47,16 +52,17 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
     );
   }
 
-  if (!data) {
+  if (!displayData) {
     return null;
   }
 
-  const upcomingHourly = data.hourly
+  const upcomingHourly = displayData.hourly
     .filter((point) => new Date(point.time).getTime() >= now)
     .slice(0, HOURLY_POINTS_SHOWN);
 
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6">
+      {fallback && <StaleDataBanner cachedAt={fallback.cachedAt} />}
       <section>
         <h3 className="mb-2 text-sm font-medium text-ink-secondary">Next hours</h3>
         <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">
@@ -83,7 +89,7 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
       <section>
         <h3 className="mb-2 text-sm font-medium text-ink-secondary">Next days</h3>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-          {data.daily.map((point) => {
+          {displayData.daily.map((point) => {
             const { label, icon } = describeWeatherCode(point.weatherCode);
             return (
               <div
