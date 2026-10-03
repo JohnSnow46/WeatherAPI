@@ -10,6 +10,8 @@ import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecast
 import { StaleDataBanner } from "@/components/StaleDataBanner";
 
 const HOURLY_POINTS_SHOWN = 24;
+const DAY_RANGE_OPTIONS = [3, 7, 14] as const;
+type DayRange = (typeof DAY_RANGE_OPTIONS)[number];
 
 function formatHour(isoTime: string): string {
   // The backend already localizes this timestamp to the location's own
@@ -31,10 +33,11 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
   // Lazy initializer: runs once on mount rather than on every render, so
   // "upcoming" filtering below doesn't call an impure function during render.
   const [now] = useState(() => Date.now());
+  const [days, setDays] = useState<DayRange>(7);
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["forecast", location.latitude, location.longitude],
-    queryFn: () => getForecast(location.latitude, location.longitude),
+    queryKey: ["forecast", location.latitude, location.longitude, days],
+    queryFn: () => getForecast(location.latitude, location.longitude, days),
   });
   const cacheKey = locationCacheKey(location.latitude, location.longitude);
   const fallback = useOfflineFallback<ForecastDto>("forecast", cacheKey, data, isError);
@@ -87,7 +90,26 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
       </section>
 
       <section>
-        <h3 className="mb-2 text-sm font-medium text-ink-secondary">Next days</h3>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-sm font-medium text-ink-secondary">Next days</h3>
+          <div role="group" aria-label="Forecast range" className="flex gap-1">
+            {DAY_RANGE_OPTIONS.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setDays(option)}
+                aria-pressed={days === option}
+                className={`rounded-full border border-border px-3 py-1 text-xs font-medium transition-colors ${
+                  days === option
+                    ? "bg-accent/10 text-accent"
+                    : "bg-card text-ink-secondary hover:bg-accent/10 hover:text-accent"
+                }`}
+              >
+                {option} days
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
           {displayData.daily.map((point) => {
             const { label, icon } = describeWeatherCode(point.weatherCode);
