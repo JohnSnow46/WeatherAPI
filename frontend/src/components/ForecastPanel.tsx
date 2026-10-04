@@ -8,6 +8,8 @@ import type { SelectedLocation } from "@/lib/location";
 import { toDisplayTemperature, type UnitSystem } from "@/lib/units";
 import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
 import { StaleDataBanner } from "@/components/StaleDataBanner";
+import { ColdStartNotice } from "@/components/ColdStartNotice";
+import { useIsSlow } from "@/hooks/useIsSlow";
 
 const HOURLY_POINTS_SHOWN = 24;
 const DAY_RANGE_OPTIONS = [3, 7, 14] as const;
@@ -42,9 +44,15 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
   const cacheKey = locationCacheKey(location.latitude, location.longitude);
   const fallback = useOfflineFallback<ForecastDto>("forecast", cacheKey, data, isError);
   const displayData = data ?? fallback?.data;
+  const isSlow = useIsSlow(isLoading);
 
   if (isLoading) {
-    return <p className="text-sm text-ink-secondary">Loading forecast…</p>;
+    return (
+      <div>
+        <p className="text-sm text-ink-secondary">Loading forecast…</p>
+        {isSlow && <ColdStartNotice />}
+      </div>
+    );
   }
 
   if (isError && !fallback) {

@@ -6,6 +6,8 @@ import { describeWeatherCode } from "@/lib/weatherCodes";
 import type { SelectedLocation } from "@/lib/location";
 import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
 import { StaleDataBanner } from "@/components/StaleDataBanner";
+import { useIsSlow } from "@/hooks/useIsSlow";
+import { ColdStartNotice } from "@/components/ColdStartNotice";
 import {
   precipitationUnitLabel,
   speedUnitLabel,
@@ -47,12 +49,14 @@ export function CurrentWeatherCard({ location, unit }: { location: SelectedLocat
   const cacheKey = locationCacheKey(location.latitude, location.longitude);
   const fallback = useOfflineFallback<CurrentWeatherDto>("current", cacheKey, data, isError);
   const displayData = data ?? fallback?.data;
+  const isSlow = useIsSlow(isLoading);
 
   return (
     <section className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-sm">
       <h2 className="text-sm font-medium text-ink-secondary">{location.label}</h2>
 
       {isLoading && <p className="mt-4 text-sm text-ink-secondary">Loading current weather…</p>}
+      {isSlow && <ColdStartNotice />}
 
       {isError && !fallback && (
         <p className="mt-4 text-sm text-red-500">
