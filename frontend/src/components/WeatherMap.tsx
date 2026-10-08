@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { mapTileUrlTemplate, type MapTileLayer } from "@/lib/api";
 import { getRadarInfo, radarTileUrlTemplate } from "@/lib/radar";
 import type { SelectedLocation } from "@/lib/location";
+import { MapLegend } from "@/components/MapLegend";
 
 // Bundlers break Leaflet's default marker icon path resolution; point it at
 // the CDN-hosted images instead of trying to bundle leaflet/dist/images.
@@ -35,6 +36,11 @@ export function WeatherMap({ location }: { location: SelectedLocation }) {
   });
 
   const latestPastFrame = radarInfo?.past.at(-1);
+
+  const initialActiveOverlays = [
+    ...(latestPastFrame ? ["Precipitation / storm radar"] : []),
+    ...OWM_LAYERS.filter((l) => l.checked).map((l) => l.name),
+  ];
 
   return (
     <section className="w-full max-w-3xl overflow-hidden rounded-3xl border border-border shadow-sm">
@@ -84,6 +90,8 @@ export function WeatherMap({ location }: { location: SelectedLocation }) {
             </LayersControl.Overlay>
           ))}
         </LayersControl>
+
+        <MapLegend initialActiveOverlays={initialActiveOverlays} />
 
         <Marker position={[location.latitude, location.longitude]}>
           <Popup>{location.label}</Popup>
