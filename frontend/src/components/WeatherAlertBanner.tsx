@@ -4,28 +4,54 @@ import { useQuery } from "@tanstack/react-query";
 import { getCurrentWeather, getForecast } from "@/lib/api";
 import { evaluateWeatherAlerts } from "@/lib/weatherAlerts";
 import type { SelectedLocation } from "@/lib/location";
+import { useNotificationPermission } from "@/hooks/useNotificationPermission";
+import { useForegroundAlertNotifications } from "@/hooks/useForegroundAlertNotifications";
+
+// How often to re-check for new alerts while notifications are enabled -- only then is
+// the extra polling worth it, and only then is it kept alive while the tab is
+// backgrounded (refetchIntervalInBackground), since that's the whole point of #13.
+const ALERT_POLL_INTERVAL_MS = 60_000;
 
 // Reuses the same query keys as CurrentWeatherCard/ForecastPanel, so
 // TanStack Query serves this from the shared cache instead of firing an
 // extra request for the same data.
 export function WeatherAlertBanner({ location }: { location: SelectedLocation }) {
+  const [permission, requestPermission] = useNotificationPermission();
+  const notificationsEnabled = permission === "granted";
+
   const current = useQuery({
     queryKey: ["current-weather", location.latitude, location.longitude],
     queryFn: () => getCurrentWeather(location.latitude, location.longitude),
+    refetchInterval: notificationsEnabled ? ALERT_POLL_INTERVAL_MS : false,
+    refetchIntervalInBackground: notificationsEnabled,
   });
   const forecast = useQuery({
     queryKey: ["forecast", location.latitude, location.longitude],
     queryFn: () => getForecast(location.latitude, location.longitude),
+    refetchInterval: notificationsEnabled ? ALERT_POLL_INTERVAL_MS : false,
+    refetchIntervalInBackground: notificationsEnabled,
   });
 
   const alerts = evaluateWeatherAlerts(current.data, forecast.data?.hourly ?? []);
+  const locationKey = `${location.latitude},${location.longitude}`;
 
-  if (alerts.length === 0) {
+  useForegroundAlertNotifications(locationKey, alerts, notificationsEnabled);
+
+  if (alerts.length === 0 && permission !== "default") {
     return null;
   }
 
   return (
     <div className="flex w-full max-w-3xl flex-col gap-2">
+      {permission === "default" && (
+        <button
+          type="button"
+          onClick={requestPermission}
+          className="self-start rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-ink-secondary transition-colors hover:bg-accent/10 hover:text-accent"
+        >
+          🔔 Enable alert notifications
+        </button>
+      )}
       {alerts.map((alert) => (
         <div
           key={alert.id}
