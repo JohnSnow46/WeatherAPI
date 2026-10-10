@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApiError, getCurrentWeather, type CurrentWeatherDto } from "@/lib/api";
 import { describeWeatherCode } from "@/lib/weatherCodes";
@@ -8,6 +9,7 @@ import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecast
 import { StaleDataBanner } from "@/components/StaleDataBanner";
 import { useIsSlow } from "@/hooks/useIsSlow";
 import { ColdStartNotice } from "@/components/ColdStartNotice";
+import { ExportSnapshotButton } from "@/components/ExportSnapshotButton";
 import {
   precipitationUnitLabel,
   speedUnitLabel,
@@ -50,10 +52,14 @@ export function CurrentWeatherCard({ location, unit }: { location: SelectedLocat
   const fallback = useOfflineFallback<CurrentWeatherDto>("current", cacheKey, data, isError);
   const displayData = data ?? fallback?.data;
   const isSlow = useIsSlow(isLoading);
+  const cardRef = useRef<HTMLElement>(null);
 
   return (
-    <section className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-sm">
-      <h2 className="text-sm font-medium text-ink-secondary">{location.label}</h2>
+    <section ref={cardRef} className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-sm">
+      <div className="flex items-start justify-between gap-2">
+        <h2 className="text-sm font-medium text-ink-secondary">{location.label}</h2>
+        {displayData && <ExportSnapshotButton targetRef={cardRef} fileName={`weather-${location.label}`} />}
+      </div>
 
       {isLoading && <p className="mt-4 text-sm text-ink-secondary">Loading current weather…</p>}
       {isSlow && <ColdStartNotice />}
