@@ -30,6 +30,15 @@ public sealed class WeatherController(IMediator mediator) : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("current/batch")]
+    public async Task<ActionResult<IReadOnlyList<BatchCurrentWeatherItemDto>>> CurrentBatch(
+        [FromBody] IReadOnlyList<CoordinatesDto>? locations,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(new GetCurrentWeatherBatchQuery(locations), cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("radar-tiles")]
     public async Task<ActionResult<RadarInfoDto>> RadarTiles(CancellationToken cancellationToken = default)
     {

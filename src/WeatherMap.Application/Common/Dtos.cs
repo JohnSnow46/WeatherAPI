@@ -50,3 +50,10 @@ public sealed record AirQualityDto(
     double Pm2_5,
     double Pm10,
     int EuropeanAqi);
+
+public sealed record CoordinatesDto(double Latitude, double Longitude);
+
+public sealed record BatchCurrentWeatherItemDto(
+    double Latitude,
+    double Longitude,
+    CurrentWeatherDto Weather);
