@@ -1,13 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getAirQuality, getCurrentWeather, getForecast } from "@/lib/api";
+import { getAirQuality, getCurrentWeather, getForecast, type CurrentWeatherDto } from "@/lib/api";
 import { describeWeatherCode } from "@/lib/weatherCodes";
 import { temperatureUnitLabel, toDisplayTemperature, type UnitSystem } from "@/lib/units";
 import { useFavoriteLocations } from "@/hooks/useFavoriteLocations";
 import type { SelectedLocation } from "@/lib/location";
 import { describeEuropeanAqi } from "@/lib/airQuality";
 import { evaluateWeatherAlerts } from "@/lib/weatherAlerts";
+import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
 
 function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation; unit: UnitSystem }) {
   // Same query keys as CurrentWeatherCard / AirQualityPanel / WeatherAlertBanner -- if this favorite is also the
@@ -27,20 +28,31 @@ function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation
   });
   const alerts = evaluateWeatherAlerts(data, forecast.data?.hourly ?? []);
 
+  // Same "current" cache key/kind as CurrentWeatherCard -- a favorite that's also the
+  // selected location reuses that entry instead of writing a second copy.
+  const cacheKey = locationCacheKey(location.latitude, location.longitude);
+  const fallback = useOfflineFallback<CurrentWeatherDto>("current", cacheKey, data, isError);
+  const displayData = data ?? fallback?.data;
+
   return (
     <div className="flex min-w-[8rem] flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-2.5 text-center shadow-sm">
       <span className="text-xs text-ink-muted">{location.label}</span>
       {isLoading && <span className="text-xs text-ink-secondary">…</span>}
-      {isError && <span className="text-xs text-ink-secondary">n/a</span>}
-      {data && (
+      {isError && !fallback && <span className="text-xs text-ink-secondary">n/a</span>}
+      {displayData && (
         <>
           <span className="text-xl" aria-hidden>
-            {describeWeatherCode(data.weatherCode).icon}
+            {describeWeatherCode(displayData.weatherCode).icon}
           </span>
           <span className="text-sm font-medium text-ink-primary">
-            {Math.round(toDisplayTemperature(data.temperatureC, unit))}
+            {Math.round(toDisplayTemperature(displayData.temperatureC, unit))}
             {temperatureUnitLabel(unit)}
           </span>
+          {fallback && (
+            <span className="text-[0.65rem] text-amber-600 dark:text-amber-400" title="Showing last saved data">
+              stale
+            </span>
+          )}
         </>
       )}
       {airQuality.data && (
