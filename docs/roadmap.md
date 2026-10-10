@@ -52,3 +52,12 @@ build on what actually exists rather than duplicate it.
 database, or SignalR — see `CLAUDE.md` §1. Item 13's "closed tab" variant and
 item 7's option (b) are the concrete cases above that would need that
 decision revisited, not just implemented as a side effect.
+
+## Next steps (round 3, 2026-10-11)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 16 | **`AirQualityPanel` missing the offline-fallback/cold-start treatment the other two panels have** — `CurrentWeatherCard` and `ForecastPanel` both use `useOfflineFallback`/`StaleDataBanner` (item #6) and `useIsSlow`/`ColdStartNotice` (item #11); `AirQualityPanel` never got either applied, so on a Render cold start or a flaky network it just spins or shows a bare error instead of the same "waking up the backend…" notice / last-known-data fallback the other two panels already give | Yes — pure UI consistency fix reusing existing hooks/components verbatim, no backend change | Small: wire up two already-existing hooks in one component | ✅ Done — same pattern as `CurrentWeatherCard`, cache key `"air-quality"` |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.
