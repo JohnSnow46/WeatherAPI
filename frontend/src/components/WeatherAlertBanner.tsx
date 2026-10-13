@@ -1,11 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getCurrentWeather, getForecast } from "@/lib/api";
+import { getCurrentWeather, getForecast, type CurrentWeatherDto, type ForecastDto } from "@/lib/api";
 import { evaluateWeatherAlerts } from "@/lib/weatherAlerts";
 import type { SelectedLocation } from "@/lib/location";
 import { useNotificationPermission } from "@/hooks/useNotificationPermission";
 import { useForegroundAlertNotifications } from "@/hooks/useForegroundAlertNotifications";
+import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
 
 // How often to re-check for new alerts while notifications are enabled -- only then is
 // the extra polling worth it, and only then is it kept alive while the tab is
@@ -32,7 +33,16 @@ export function WeatherAlertBanner({ location }: { location: SelectedLocation })
     refetchIntervalInBackground: notificationsEnabled,
   });
 
-  const alerts = evaluateWeatherAlerts(current.data, forecast.data?.hourly ?? []);
+  // Same offline-fallback pattern as CurrentWeatherCard/ForecastPanel (roadmap #6) --
+  // without it, a cold start or network blip made alerts (including an already-active
+  // one) silently vanish instead of falling back to the last known state.
+  const cacheKey = locationCacheKey(location.latitude, location.longitude);
+  const currentFallback = useOfflineFallback<CurrentWeatherDto>("current", cacheKey, current.data, current.isError);
+  const forecastFallback = useOfflineFallback<ForecastDto>("forecast", cacheKey, forecast.data, forecast.isError);
+  const displayCurrent = current.data ?? currentFallback?.data;
+  const displayForecast = forecast.data ?? forecastFallback?.data;
+
+  const alerts = evaluateWeatherAlerts(displayCurrent, displayForecast?.hourly ?? []);
   const locationKey = `${location.latitude},${location.longitude}`;
 
   useForegroundAlertNotifications(locationKey, alerts, notificationsEnabled);

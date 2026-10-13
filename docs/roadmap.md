@@ -62,3 +62,12 @@ decision revisited, not just implemented as a side effect.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 4, 2026-10-13)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 18 | **`WeatherAlertBanner` missing the offline-fallback treatment too** — items #16/#17 closed this same gap on `AirQualityPanel` and `FavoritesComparisonGrid`; `WeatherAlertBanner` had the same bug: on a cold start or network blip, `current.data`/`forecast.data` go `undefined`, `evaluateWeatherAlerts` gets empty input, and an already-active severe-weather alert silently disappears instead of falling back to the last known state | Yes — same `useOfflineFallback` hook, reusing the `"current"`/`"forecast"` cache kinds/keys `CurrentWeatherCard`/`ForecastPanel` already write for the same location | Small: two hook calls, no new component | ✅ Done — `displayCurrent`/`displayForecast` feed `evaluateWeatherAlerts` instead of the raw query data |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.
