@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAirQuality, getCurrentWeather, getForecast, type CurrentWeatherDto } from "@/lib/api";
 import { describeWeatherCode } from "@/lib/weatherCodes";
@@ -9,6 +10,7 @@ import type { SelectedLocation } from "@/lib/location";
 import { describeEuropeanAqi } from "@/lib/airQuality";
 import { evaluateWeatherAlerts } from "@/lib/weatherAlerts";
 import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
+import { ExportSnapshotButton } from "@/components/ExportSnapshotButton";
 
 function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation; unit: UnitSystem }) {
   // Same query keys as CurrentWeatherCard / AirQualityPanel / WeatherAlertBanner -- if this favorite is also the
@@ -75,14 +77,18 @@ const MIN_FAVORITES_TO_COMPARE = 2;
 
 export function FavoritesComparisonGrid({ unit }: { unit: UnitSystem }) {
   const { favorites } = useFavoriteLocations();
+  const gridRef = useRef<HTMLElement>(null);
 
   if (favorites.length < MIN_FAVORITES_TO_COMPARE) {
     return null;
   }
 
   return (
-    <section className="flex w-full max-w-3xl flex-col gap-2">
-      <h3 className="text-sm font-medium text-ink-secondary">Comparing your favorites</h3>
+    <section ref={gridRef} className="flex w-full max-w-3xl flex-col gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-sm font-medium text-ink-secondary">Comparing your favorites</h3>
+        <ExportSnapshotButton targetRef={gridRef} fileName="weather-comparison" />
+      </div>
       <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">
         {favorites.map((favorite) => (
           <FavoriteConditionsTile key={`${favorite.latitude},${favorite.longitude}`} location={favorite} unit={unit} />
