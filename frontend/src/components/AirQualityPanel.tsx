@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApiError, getAirQuality, type AirQualityDto } from "@/lib/api";
 import { describeEuropeanAqi } from "@/lib/airQuality";
@@ -8,6 +9,7 @@ import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecast
 import { StaleDataBanner } from "@/components/StaleDataBanner";
 import { ColdStartNotice } from "@/components/ColdStartNotice";
 import { useIsSlow } from "@/hooks/useIsSlow";
+import { ExportSnapshotButton } from "@/components/ExportSnapshotButton";
 
 export function AirQualityPanel({ location }: { location: SelectedLocation }) {
   const { data, isLoading, isError, error } = useQuery({
@@ -18,10 +20,14 @@ export function AirQualityPanel({ location }: { location: SelectedLocation }) {
   const fallback = useOfflineFallback<AirQualityDto>("air-quality", cacheKey, data, isError);
   const displayData = data ?? fallback?.data;
   const isSlow = useIsSlow(isLoading);
+  const panelRef = useRef<HTMLElement>(null);
 
   return (
-    <section className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-sm">
-      <h2 className="text-sm font-medium text-ink-secondary">Air quality</h2>
+    <section ref={panelRef} className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-sm">
+      <div className="flex items-start justify-between gap-2">
+        <h2 className="text-sm font-medium text-ink-secondary">Air quality</h2>
+        {displayData && <ExportSnapshotButton targetRef={panelRef} fileName={`air-quality-${location.label}`} />}
+      </div>
 
       {isLoading && <p className="mt-4 text-sm text-ink-secondary">Loading air quality…</p>}
       {isSlow && <ColdStartNotice />}

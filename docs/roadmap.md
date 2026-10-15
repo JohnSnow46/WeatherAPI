@@ -71,3 +71,13 @@ database, or SignalR — see `CLAUDE.md` §1.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 5, 2026-10-15)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 19 | **`WeatherAlertBanner`'s alert text ignored the metric/imperial toggle (#3)** — `CurrentWeatherCard`/`ForecastPanel` already convert every displayed number through `lib/units.ts` when `unit === "imperial"`, but `evaluateWeatherAlerts` hardcoded "km/h"/"mm" in the alert message text regardless of the toggle, so a user who switched to °F/mph still saw "Strong wind right now: 64 km/h" | Yes — same `lib/units.ts` conversion helpers already used elsewhere, no new dependency | Small: thread a `unit` param through `evaluateWeatherAlerts` and its two callers (`WeatherAlertBanner`, `FavoritesComparisonGrid`'s per-tile alert count) | ✅ Done — alert messages now render in the active unit, same as every other number on the page |
+| 20 | **`AirQualityPanel` was the only one of the three main panels without the PNG-export button (#12)** — `CurrentWeatherCard` and `FavoritesComparisonGrid` both got `ExportSnapshotButton`; `AirQualityPanel` never did despite being the same shape of card | Yes — same component, already lazy-loaded | Small: one `useRef` + one button, mirrors `CurrentWeatherCard` exactly | ✅ Done — `fileName="air-quality-<location>"` |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.
