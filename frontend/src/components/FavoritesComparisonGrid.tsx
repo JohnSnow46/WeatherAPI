@@ -28,7 +28,7 @@ function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation
     queryKey: ["forecast", location.latitude, location.longitude],
     queryFn: () => getForecast(location.latitude, location.longitude),
   });
-  const alerts = evaluateWeatherAlerts(data, forecast.data?.hourly ?? []);
+  const alerts = evaluateWeatherAlerts(data, forecast.data?.hourly ?? [], unit);
 
   // Same "current" cache key/kind as CurrentWeatherCard -- a favorite that's also the
   // selected location reuses that entry instead of writing a second copy.

@@ -7,6 +7,7 @@ import type { SelectedLocation } from "@/lib/location";
 import { useNotificationPermission } from "@/hooks/useNotificationPermission";
 import { useForegroundAlertNotifications } from "@/hooks/useForegroundAlertNotifications";
 import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
+import type { UnitSystem } from "@/lib/units";
 
 // How often to re-check for new alerts while notifications are enabled -- only then is
 // the extra polling worth it, and only then is it kept alive while the tab is
@@ -16,7 +17,7 @@ const ALERT_POLL_INTERVAL_MS = 60_000;
 // Reuses the same query keys as CurrentWeatherCard/ForecastPanel, so
 // TanStack Query serves this from the shared cache instead of firing an
 // extra request for the same data.
-export function WeatherAlertBanner({ location }: { location: SelectedLocation }) {
+export function WeatherAlertBanner({ location, unit }: { location: SelectedLocation; unit: UnitSystem }) {
   const [permission, requestPermission] = useNotificationPermission();
   const notificationsEnabled = permission === "granted";
 
@@ -42,7 +43,7 @@ export function WeatherAlertBanner({ location }: { location: SelectedLocation })
   const displayCurrent = current.data ?? currentFallback?.data;
   const displayForecast = forecast.data ?? forecastFallback?.data;
 
-  const alerts = evaluateWeatherAlerts(displayCurrent, displayForecast?.hourly ?? []);
+  const alerts = evaluateWeatherAlerts(displayCurrent, displayForecast?.hourly ?? [], unit);
   const locationKey = `${location.latitude},${location.longitude}`;
 
   useForegroundAlertNotifications(locationKey, alerts, notificationsEnabled);

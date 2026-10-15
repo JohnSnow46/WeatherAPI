@@ -124,7 +124,7 @@ export function WeatherDashboard() {
 
       {selected && (
         <div className="flex w-full flex-col items-center gap-6">
-          <WeatherAlertBanner location={selected} />
+          <WeatherAlertBanner location={selected} unit={unit} />
           <CurrentWeatherCard location={selected} unit={unit} />
           <AirQualityPanel location={selected} />
           <ForecastPanel location={selected} unit={unit} />
