@@ -81,3 +81,12 @@ database, or SignalR — see `CLAUDE.md` §1.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 6, 2026-10-16)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 21 | **`ForecastPanel` was the last of the four main panels without the PNG-export button (#12)** — round 5 closed this gap on `AirQualityPanel`; `ForecastPanel` (hourly + daily forecast) was the one remaining panel that never got it | Yes — same component, already lazy-loaded | Small: one `useRef` + one button next to the "Next hours" heading | ✅ Done — `fileName="forecast-<location>"` |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.

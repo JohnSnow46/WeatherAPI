@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApiError, getForecast, type ForecastDto } from "@/lib/api";
 import { describeWeatherCode } from "@/lib/weatherCodes";
@@ -10,6 +10,7 @@ import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecast
 import { StaleDataBanner } from "@/components/StaleDataBanner";
 import { ColdStartNotice } from "@/components/ColdStartNotice";
 import { useIsSlow } from "@/hooks/useIsSlow";
+import { ExportSnapshotButton } from "@/components/ExportSnapshotButton";
 
 const HOURLY_POINTS_SHOWN = 24;
 const DAY_RANGE_OPTIONS = [3, 7, 14] as const;
@@ -45,6 +46,7 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
   const fallback = useOfflineFallback<ForecastDto>("forecast", cacheKey, data, isError);
   const displayData = data ?? fallback?.data;
   const isSlow = useIsSlow(isLoading);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   if (isLoading) {
     return (
@@ -72,10 +74,13 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
     .slice(0, HOURLY_POINTS_SHOWN);
 
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-6">
+    <div ref={panelRef} className="flex w-full max-w-3xl flex-col gap-6">
       {fallback && <StaleDataBanner cachedAt={fallback.cachedAt} />}
       <section>
-        <h3 className="mb-2 text-sm font-medium text-ink-secondary">Next hours</h3>
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium text-ink-secondary">Next hours</h3>
+          <ExportSnapshotButton targetRef={panelRef} fileName={`forecast-${location.label}`} />
+        </div>
         <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">
           {upcomingHourly.map((point) => {
             const { icon } = describeWeatherCode(point.weatherCode);
