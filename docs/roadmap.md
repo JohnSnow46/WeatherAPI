@@ -90,3 +90,12 @@ database, or SignalR — see `CLAUDE.md` §1.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 7, 2026-10-18)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 22 | **`WeatherAlertBanner` never showed `StaleDataBanner` even though it already computes an offline fallback (#18)** — `CurrentWeatherCard`/`ForecastPanel`/`AirQualityPanel` all show `StaleDataBanner` when displaying cached data; `WeatherAlertBanner` computes `currentFallback`/`forecastFallback` (added round 4, item #18) but never rendered the banner, so an alert based on stale cached data gave no "might be outdated" signal the other three panels already give | Yes — same `StaleDataBanner` component, already imported elsewhere | Small: one conditional render, reusing an existing component | ✅ Done — shown alongside the alerts whenever either fallback is active |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.

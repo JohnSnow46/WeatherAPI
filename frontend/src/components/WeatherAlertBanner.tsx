@@ -7,6 +7,7 @@ import type { SelectedLocation } from "@/lib/location";
 import { useNotificationPermission } from "@/hooks/useNotificationPermission";
 import { useForegroundAlertNotifications } from "@/hooks/useForegroundAlertNotifications";
 import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
+import { StaleDataBanner } from "@/components/StaleDataBanner";
 import type { UnitSystem } from "@/lib/units";
 
 // How often to re-check for new alerts while notifications are enabled -- only then is
@@ -52,8 +53,14 @@ export function WeatherAlertBanner({ location, unit }: { location: SelectedLocat
     return null;
   }
 
+  // Same StaleDataBanner CurrentWeatherCard/ForecastPanel/AirQualityPanel already show --
+  // an alert based on cached data (current or forecast) deserves the same "might be
+  // outdated" transparency as any other panel's fallback value.
+  const fallback = currentFallback ?? forecastFallback;
+
   return (
     <div className="flex w-full max-w-3xl flex-col gap-2">
+      {fallback && alerts.length > 0 && <StaleDataBanner cachedAt={fallback.cachedAt} />}
       {permission === "default" && (
         <button
           type="button"
