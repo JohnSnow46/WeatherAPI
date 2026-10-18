@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAirQuality, getCurrentWeather, getForecast, type CurrentWeatherDto } from "@/lib/api";
+import { getAirQuality, getCurrentWeather, getForecast, type AirQualityDto, type CurrentWeatherDto } from "@/lib/api";
 import { describeWeatherCode } from "@/lib/weatherCodes";
 import { temperatureUnitLabel, toDisplayTemperature, type UnitSystem } from "@/lib/units";
 import { useFavoriteLocations } from "@/hooks/useFavoriteLocations";
@@ -30,11 +30,21 @@ function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation
   });
   const alerts = evaluateWeatherAlerts(data, forecast.data?.hourly ?? [], unit);
 
-  // Same "current" cache key/kind as CurrentWeatherCard -- a favorite that's also the
-  // selected location reuses that entry instead of writing a second copy.
+  // Same "current"/"air-quality" cache keys/kinds as CurrentWeatherCard/AirQualityPanel --
+  // a favorite that's also the selected location reuses those entries instead of writing
+  // a second copy. The temperature side already had this (roadmap #17); the AQI badge
+  // never did, so it just showed nothing on a cold start/network blip instead of falling
+  // back to the last known value like every other piece of data in this tile.
   const cacheKey = locationCacheKey(location.latitude, location.longitude);
   const fallback = useOfflineFallback<CurrentWeatherDto>("current", cacheKey, data, isError);
   const displayData = data ?? fallback?.data;
+  const airQualityFallback = useOfflineFallback<AirQualityDto>(
+    "air-quality",
+    cacheKey,
+    airQuality.data,
+    airQuality.isError,
+  );
+  const displayAirQuality = airQuality.data ?? airQualityFallback?.data;
 
   return (
     <div className="flex min-w-[8rem] flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-2.5 text-center shadow-sm">
@@ -57,9 +67,9 @@ function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation
           )}
         </>
       )}
-      {airQuality.data && (
-        <span className={`text-xs font-medium ${describeEuropeanAqi(airQuality.data.europeanAqi).colorClass}`}>
-          AQI {describeEuropeanAqi(airQuality.data.europeanAqi).label}
+      {displayAirQuality && (
+        <span className={`text-xs font-medium ${describeEuropeanAqi(displayAirQuality.europeanAqi).colorClass}`}>
+          AQI {describeEuropeanAqi(displayAirQuality.europeanAqi).label}
         </span>
       )}
       {alerts.length > 0 && (
