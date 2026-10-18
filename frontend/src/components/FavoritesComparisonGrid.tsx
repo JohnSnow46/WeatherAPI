@@ -2,7 +2,14 @@
 
 import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAirQuality, getCurrentWeather, getForecast, type AirQualityDto, type CurrentWeatherDto } from "@/lib/api";
+import {
+  getAirQuality,
+  getCurrentWeather,
+  getForecast,
+  type AirQualityDto,
+  type CurrentWeatherDto,
+  type ForecastDto,
+} from "@/lib/api";
 import { describeWeatherCode } from "@/lib/weatherCodes";
 import { temperatureUnitLabel, toDisplayTemperature, type UnitSystem } from "@/lib/units";
 import { useFavoriteLocations } from "@/hooks/useFavoriteLocations";
@@ -28,16 +35,17 @@ function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation
     queryKey: ["forecast", location.latitude, location.longitude],
     queryFn: () => getForecast(location.latitude, location.longitude),
   });
-  const alerts = evaluateWeatherAlerts(data, forecast.data?.hourly ?? [], unit);
-
-  // Same "current"/"air-quality" cache keys/kinds as CurrentWeatherCard/AirQualityPanel --
-  // a favorite that's also the selected location reuses those entries instead of writing
-  // a second copy. The temperature side already had this (roadmap #17); the AQI badge
-  // never did, so it just showed nothing on a cold start/network blip instead of falling
-  // back to the last known value like every other piece of data in this tile.
+  // Same "current"/"forecast"/"air-quality" cache keys/kinds as
+  // CurrentWeatherCard/ForecastPanel/AirQualityPanel -- a favorite that's also the selected
+  // location reuses those entries instead of writing a second copy. The temperature side
+  // already had this (roadmap #17); the AQI badge and the alert count below didn't, so
+  // they just disappeared on a cold start/network blip instead of falling back to the last
+  // known value like every other piece of data in this tile.
   const cacheKey = locationCacheKey(location.latitude, location.longitude);
   const fallback = useOfflineFallback<CurrentWeatherDto>("current", cacheKey, data, isError);
   const displayData = data ?? fallback?.data;
+  const forecastFallback = useOfflineFallback<ForecastDto>("forecast", cacheKey, forecast.data, forecast.isError);
+  const displayForecast = forecast.data ?? forecastFallback?.data;
   const airQualityFallback = useOfflineFallback<AirQualityDto>(
     "air-quality",
     cacheKey,
@@ -45,6 +53,8 @@ function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation
     airQuality.isError,
   );
   const displayAirQuality = airQuality.data ?? airQualityFallback?.data;
+
+  const alerts = evaluateWeatherAlerts(displayData, displayForecast?.hourly ?? [], unit);
 
   return (
     <div className="flex min-w-[8rem] flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-2.5 text-center shadow-sm">
