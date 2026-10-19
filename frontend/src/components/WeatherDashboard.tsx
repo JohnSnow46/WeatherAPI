@@ -128,7 +128,7 @@ export function WeatherDashboard() {
           <CurrentWeatherCard location={selected} unit={unit} />
           <AirQualityPanel location={selected} />
           <ForecastPanel location={selected} unit={unit} />
-          <WeatherMap location={selected} />
+          <WeatherMap location={selected} unit={unit} />
         </div>
       )}
     </div>

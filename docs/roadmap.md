@@ -101,3 +101,12 @@ database, or SignalR — see `CLAUDE.md` §1.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 8, 2026-10-19)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 25 | **`MapLegend` ignored the metric/imperial toggle (#3, #14)** — item #19 closed this gap on alert messages; the map legend was the last place still hardcoding units: its Temperature scale always read °C and its Wind scale m/s, so a user on °F/mph saw every panel in imperial except the map right below them | Yes — same `lib/units.ts` helpers; stops stay in OWM's own units (they position the gradient), only the tick labels convert | Small: thread `unit` through `WeatherDashboard` → `WeatherMap` → `MapLegend`, per-entry `formatValue` | ✅ Done — imperial shows °F and mph labels; metric keeps OWM's published °C/m/s scale |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.

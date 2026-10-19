@@ -7,6 +7,7 @@ import { mapTileUrlTemplate, type MapTileLayer } from "@/lib/api";
 import { getRadarInfo, radarTileUrlTemplate } from "@/lib/radar";
 import type { SelectedLocation } from "@/lib/location";
 import { MapLegend } from "@/components/MapLegend";
+import type { UnitSystem } from "@/lib/units";
 
 // Bundlers break Leaflet's default marker icon path resolution; point it at
 // the CDN-hosted images instead of trying to bundle leaflet/dist/images.
@@ -29,7 +30,7 @@ const OWM_LAYERS: { layer: MapTileLayer; name: string; checked?: boolean }[] = [
   { layer: "temp_new", name: "Temperature" },
 ];
 
-export function WeatherMap({ location }: { location: SelectedLocation }) {
+export function WeatherMap({ location, unit }: { location: SelectedLocation; unit: UnitSystem }) {
   const { data: radarInfo } = useQuery({
     queryKey: ["radar-info"],
     queryFn: getRadarInfo,
@@ -91,7 +92,7 @@ export function WeatherMap({ location }: { location: SelectedLocation }) {
           ))}
         </LayersControl>
 
-        <MapLegend initialActiveOverlays={initialActiveOverlays} />
+        <MapLegend initialActiveOverlays={initialActiveOverlays} unit={unit} />
 
         <Marker position={[location.latitude, location.longitude]}>
           <Popup>{location.label}</Popup>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import L from "leaflet";
 import { useMap } from "react-leaflet";
+import { speedUnitLabel, temperatureUnitLabel, toDisplaySpeed, toDisplayTemperature, type UnitSystem } from "@/lib/units";
 
 type ColorStop = { value: number; color: string };
 
@@ -56,18 +57,43 @@ interface LegendEntry {
   unit: string;
   stops: ColorStop[];
   labelValues: number[];
+  /** Converts a stop value (in OWM's own unit) to the displayed label; identity when omitted. */
+  formatValue?: (value: number) => number;
 }
 
-const GRADIENT_LEGENDS: LegendEntry[] = [
-  { overlayName: "Wind", title: "Wind", unit: "m/s", stops: WIND_STOPS, labelValues: [1, 15, 50, 200] },
-  { overlayName: "Clouds", title: "Clouds", unit: "%", stops: CLOUD_STOPS, labelValues: [0, 50, 100] },
-  { overlayName: "Pressure", title: "Pressure", unit: "hPa", stops: PRESSURE_STOPS, labelValues: [940, 1000, 1040, 1080] },
-  { overlayName: "Temperature", title: "Temperature", unit: "°C", stops: TEMPERATURE_STOPS, labelValues: [-40, 0, 20, 30] },
-];
+const KMH_PER_MS = 3.6;
+
+// Stops stay in OWM's own units (they position the gradient); only the displayed
+// labels follow the page's metric/imperial toggle. Metric keeps OWM's published
+// m/s for wind rather than re-deriving km/h, imperial converts through lib/units.ts
+// the same way every other number on the page does.
+function gradientLegends(unit: UnitSystem): LegendEntry[] {
+  const imperial = unit === "imperial";
+  return [
+    {
+      overlayName: "Wind",
+      title: "Wind",
+      unit: imperial ? speedUnitLabel(unit) : "m/s",
+      stops: WIND_STOPS,
+      labelValues: [1, 15, 50, 200],
+      formatValue: imperial ? (ms) => toDisplaySpeed(ms * KMH_PER_MS, unit) : undefined,
+    },
+    { overlayName: "Clouds", title: "Clouds", unit: "%", stops: CLOUD_STOPS, labelValues: [0, 50, 100] },
+    { overlayName: "Pressure", title: "Pressure", unit: "hPa", stops: PRESSURE_STOPS, labelValues: [940, 1000, 1040, 1080] },
+    {
+      overlayName: "Temperature",
+      title: "Temperature",
+      unit: temperatureUnitLabel(unit),
+      stops: TEMPERATURE_STOPS,
+      labelValues: [-40, 0, 20, 30],
+      formatValue: (celsius) => toDisplayTemperature(celsius, unit),
+    },
+  ];
+}
 
 const RADAR_OVERLAY_NAME = "Precipitation / storm radar";
 
-function GradientSwatch({ title, unit, stops, labelValues }: Omit<LegendEntry, "overlayName">) {
+function GradientSwatch({ title, unit, stops, labelValues, formatValue }: Omit<LegendEntry, "overlayName">) {
   const min = stops[0].value;
   const max = stops[stops.length - 1].value;
   const gradient = `linear-gradient(to right, ${stops
@@ -87,7 +113,7 @@ function GradientSwatch({ title, unit, stops, labelValues }: Omit<LegendEntry, "
             className="absolute -translate-x-1/2"
             style={{ left: `${(((value - min) / (max - min)) * 100).toFixed(1)}%` }}
           >
-            {value}
+            {formatValue ? Math.round(formatValue(value)) : value}
           </span>
         ))}
       </div>
@@ -102,7 +128,13 @@ function GradientSwatch({ title, unit, stops, labelValues }: Omit<LegendEntry, "
  * corner-positioning system -- `useMap()` only works for a descendant of `MapContainer`,
  * and Leaflet's corner containers live inside the map's own DOM, not the React tree around it.
  */
-export function MapLegend({ initialActiveOverlays = [] }: { initialActiveOverlays?: readonly string[] }) {
+export function MapLegend({
+  initialActiveOverlays = [],
+  unit,
+}: {
+  initialActiveOverlays?: readonly string[];
+  unit: UnitSystem;
+}) {
   const map = useMap();
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [activeOverlays, setActiveOverlays] = useState<ReadonlySet<string>>(() => new Set(initialActiveOverlays));
@@ -144,7 +176,7 @@ export function MapLegend({ initialActiveOverlays = [] }: { initialActiveOverlay
     return null;
   }
 
-  const visibleGradientLegends = GRADIENT_LEGENDS.filter((legend) => activeOverlays.has(legend.overlayName));
+  const visibleGradientLegends = gradientLegends(unit).filter((legend) => activeOverlays.has(legend.overlayName));
   const showRadarLegend = activeOverlays.has(RADAR_OVERLAY_NAME);
 
   if (visibleGradientLegends.length === 0 && !showRadarLegend) {
@@ -172,6 +204,7 @@ export function MapLegend({ initialActiveOverlays = [] }: { initialActiveOverlay
           unit={legend.unit}
           stops={legend.stops}
           labelValues={legend.labelValues}
+          formatValue={legend.formatValue}
         />
       ))}
       <span className="text-[10px] text-ink-muted">Source: openweathermap.org/map_legend</span>
