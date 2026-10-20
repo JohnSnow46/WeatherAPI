@@ -110,3 +110,12 @@ database, or SignalR — see `CLAUDE.md` §1.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 9, 2026-10-20)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 26 | **`LocationSearch`'s result dropdown was mouse-only** — a keyboard user could type a city name but had no way to pick a result: no arrow-key highlighting, Enter did nothing, Escape didn't close the list, and the dropdown carried no combobox/listbox semantics for screen readers | Yes — local component state only, no new dependency | Small: `activeIndex` state + `onKeyDown` handler, `role="combobox"`/`listbox`/`option` + `aria-activedescendant` | ✅ Done — ↑/↓ wrap through results, Enter selects, Esc closes; mouse hover keeps the highlight in sync |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.
