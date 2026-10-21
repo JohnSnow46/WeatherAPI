@@ -125,6 +125,7 @@ database, or SignalR — see `CLAUDE.md` §1.
 | # | Feature | Fits current architecture? | Rough scope | Status |
 |---|---|---|---|---|
 | 27 | **`CurrentWeatherCard` never showed the wind direction** — `CurrentWeatherDto.windDirectionDeg` has been on the API response since the start, but the Wind tile only rendered the speed, so "18 km/h" didn't say whether it's a headwind on the way home | Yes — field already fetched, no backend change | Small: new `lib/wind.ts` `compassDirection` (8-point, meteorological "from" convention) appended to the Wind tile | ✅ Done — e.g. "18 km/h NW" |
+| 28 | **`ForecastPanel`'s daily cards never showed the precipitation total** — same "fetched but never rendered" gap as #27: `DailyForecastPointDto.precipitationSumMm` is on every daily point, but each card only showed the icon and max/min temperature, which can't tell a passing shower from an all-day soak | Yes — field already fetched, same `lib/units.ts` precipitation helpers as `CurrentWeatherCard` | Small: one conditional line per daily card | ✅ Done — "💧 4.2 mm" (or inches) when the day's total is above zero |
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.

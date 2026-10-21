@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ApiError, getForecast, type ForecastDto } from "@/lib/api";
 import { describeWeatherCode } from "@/lib/weatherCodes";
 import type { SelectedLocation } from "@/lib/location";
-import { toDisplayTemperature, type UnitSystem } from "@/lib/units";
+import { precipitationUnitLabel, toDisplayPrecipitation, toDisplayTemperature, type UnitSystem } from "@/lib/units";
 import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
 import { StaleDataBanner } from "@/components/StaleDataBanner";
 import { ColdStartNotice } from "@/components/ColdStartNotice";
@@ -142,6 +142,14 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
                   {" / "}
                   {Math.round(toDisplayTemperature(point.tempMinC, unit))}°
                 </span>
+                {/* precipitationSumMm was always on DailyForecastPointDto but never rendered --
+                    the icon alone can't tell a passing shower from an all-day soak. */}
+                {point.precipitationSumMm > 0 && (
+                  <span className="text-xs text-ink-muted">
+                    💧 {toDisplayPrecipitation(point.precipitationSumMm, unit).toFixed(unit === "imperial" ? 2 : 1)}{" "}
+                    {precipitationUnitLabel(unit)}
+                  </span>
+                )}
               </div>
             );
           })}
