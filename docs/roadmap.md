@@ -119,3 +119,12 @@ database, or SignalR — see `CLAUDE.md` §1.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 10, 2026-10-21)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 27 | **`CurrentWeatherCard` never showed the wind direction** — `CurrentWeatherDto.windDirectionDeg` has been on the API response since the start, but the Wind tile only rendered the speed, so "18 km/h" didn't say whether it's a headwind on the way home | Yes — field already fetched, no backend change | Small: new `lib/wind.ts` `compassDirection` (8-point, meteorological "from" convention) appended to the Wind tile | ✅ Done — e.g. "18 km/h NW" |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.

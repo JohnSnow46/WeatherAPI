@@ -10,6 +10,7 @@ import { StaleDataBanner } from "@/components/StaleDataBanner";
 import { useIsSlow } from "@/hooks/useIsSlow";
 import { ColdStartNotice } from "@/components/ColdStartNotice";
 import { ExportSnapshotButton } from "@/components/ExportSnapshotButton";
+import { compassDirection } from "@/lib/wind";
 import {
   precipitationUnitLabel,
   speedUnitLabel,
@@ -25,21 +26,24 @@ const STAT_TILES = [
     key: "apparentTemperatureC" as const,
     icon: "🌡️",
     label: "Feels like",
-    format: (v: number, unit: UnitSystem) =>
-      `${Math.round(toDisplayTemperature(v, unit))}${temperatureUnitLabel(unit)}`,
+    format: (d: CurrentWeatherDto, unit: UnitSystem) =>
+      `${Math.round(toDisplayTemperature(d.apparentTemperatureC, unit))}${temperatureUnitLabel(unit)}`,
   },
   {
     key: "windSpeedKmh" as const,
     icon: "💨",
     label: "Wind",
-    format: (v: number, unit: UnitSystem) => `${Math.round(toDisplaySpeed(v, unit))} ${speedUnitLabel(unit)}`,
+    // windDirectionDeg was always on the DTO but never shown -- speed alone doesn't tell a
+    // cyclist whether it's a headwind on the way home.
+    format: (d: CurrentWeatherDto, unit: UnitSystem) =>
+      `${Math.round(toDisplaySpeed(d.windSpeedKmh, unit))} ${speedUnitLabel(unit)} ${compassDirection(d.windDirectionDeg)}`.trim(),
   },
   {
     key: "precipitationMm" as const,
     icon: "💧",
     label: "Precipitation",
-    format: (v: number, unit: UnitSystem) =>
-      `${toDisplayPrecipitation(v, unit).toFixed(unit === "imperial" ? 2 : 1)} ${precipitationUnitLabel(unit)}`,
+    format: (d: CurrentWeatherDto, unit: UnitSystem) =>
+      `${toDisplayPrecipitation(d.precipitationMm, unit).toFixed(unit === "imperial" ? 2 : 1)} ${precipitationUnitLabel(unit)}`,
   },
 ];
 
@@ -98,7 +102,7 @@ export function CurrentWeatherCard({ location, unit }: { location: SelectedLocat
                   <span aria-hidden>{icon}</span>
                   {label}
                 </dt>
-                <dd className="mt-0.5 font-medium text-ink-primary">{format(displayData[key], unit)}</dd>
+                <dd className="mt-0.5 font-medium text-ink-primary">{format(displayData, unit)}</dd>
               </div>
             ))}
             <div>
