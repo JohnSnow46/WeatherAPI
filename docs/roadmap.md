@@ -129,3 +129,12 @@ database, or SignalR — see `CLAUDE.md` §1.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 11, 2026-10-22)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 29 | **`ForecastPanel`'s hourly chips never showed precipitation** — #28 added the daily total to the day cards; the hourly chips one section above still showed only icon + temperature, even though `HourlyForecastPointDto.precipitationMm` is on every point, so "which hour will it rain" was only guessable from the icon | Yes — field already fetched, same `lib/units.ts` helper | Small: one conditional line per hourly chip | ✅ Done — "💧 0.6" under the temperature when the hour's value is above zero |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.

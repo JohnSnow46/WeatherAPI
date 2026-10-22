@@ -96,6 +96,14 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
                 <span className="text-sm font-medium text-ink-primary">
                   {Math.round(toDisplayTemperature(point.temperatureC, unit))}°
                 </span>
+                {/* Same treatment the daily cards got for precipitationSumMm -- the hourly
+                    precipitationMm was fetched but never shown, so "which hour will it rain"
+                    was only guessable from the icon. */}
+                {point.precipitationMm > 0 && (
+                  <span className="text-[10px] text-ink-muted">
+                    💧 {toDisplayPrecipitation(point.precipitationMm, unit).toFixed(unit === "imperial" ? 2 : 1)}
+                  </span>
+                )}
               </div>
             );
           })}
