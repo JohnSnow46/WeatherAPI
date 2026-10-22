@@ -135,6 +135,7 @@ database, or SignalR — see `CLAUDE.md` §1.
 | # | Feature | Fits current architecture? | Rough scope | Status |
 |---|---|---|---|---|
 | 29 | **`ForecastPanel`'s hourly chips never showed precipitation** — #28 added the daily total to the day cards; the hourly chips one section above still showed only icon + temperature, even though `HourlyForecastPointDto.precipitationMm` is on every point, so "which hour will it rain" was only guessable from the icon | Yes — field already fetched, same `lib/units.ts` helper | Small: one conditional line per hourly chip | ✅ Done — "💧 0.6" under the temperature when the hour's value is above zero |
+| 30 | **`CurrentWeatherCard` never showed when the reading was taken** — `CurrentWeatherDto.time` (Open-Meteo's observation time, already in the location's own UTC offset) has always been on the response, but the card gave no hint whether "12°" was from five minutes or an hour ago | Yes — field already fetched; read `HH:MM` straight from the offset-qualified string, same approach `ForecastPanel.formatHour` uses | Small: one line under the condition label | ✅ Done — "Updated 14:15 local time" |
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.

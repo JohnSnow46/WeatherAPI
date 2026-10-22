@@ -90,6 +90,10 @@ export function CurrentWeatherCard({ location, unit }: { location: SelectedLocat
                     {Math.round(toDisplayTemperature(displayData.temperatureC, unit))}°
                   </p>
                   <p className="text-sm text-ink-secondary">{label}</p>
+                  {/* CurrentWeatherDto.time (the observation time, already in the location's own
+                      UTC offset) was never shown -- without it there was no way to tell a
+                      fresh reading from one Open-Meteo last updated a while ago. */}
+                  <p className="text-xs text-ink-muted">Updated {displayData.time.slice(11, 16)} local time</p>
                 </div>
               </div>
             );
