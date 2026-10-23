@@ -46,6 +46,9 @@ export function AirQualityPanel({ location }: { location: SelectedLocation }) {
           return (
             <>
               <p className={`mt-3 text-2xl font-semibold tracking-tight ${colorClass}`}>{label}</p>
+              {/* The index itself was only ever used to pick the label/color -- each band spans
+                  20 points (lib/airQuality.ts), so the number tells a borderline day from a clear one. */}
+              <p className="text-xs text-ink-muted">European AQI {Math.round(displayData.europeanAqi)}</p>
               <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-4 text-sm">
                 <div>
                   <dt className="text-xs text-ink-muted">PM2.5</dt>

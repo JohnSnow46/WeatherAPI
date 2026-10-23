@@ -139,3 +139,12 @@ database, or SignalR — see `CLAUDE.md` §1.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 12, 2026-10-23)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 31 | **`AirQualityPanel` never showed the AQI number itself** — `europeanAqi` was only used to pick the "Good/Fair/Moderate..." label and color, but each band spans 20 points, so a 41 and a 59 looked identical | Yes — field already fetched | Small: one line under the label | ✅ Done — "European AQI 42" |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.
