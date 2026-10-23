@@ -145,6 +145,7 @@ database, or SignalR — see `CLAUDE.md` §1.
 | # | Feature | Fits current architecture? | Rough scope | Status |
 |---|---|---|---|---|
 | 31 | **`AirQualityPanel` never showed the AQI number itself** — `europeanAqi` was only used to pick the "Good/Fair/Moderate..." label and color, but each band spans 20 points, so a 41 and a 59 looked identical | Yes — field already fetched | Small: one line under the label | ✅ Done — "European AQI 42" |
+| 32 | **`AirQualityPanel` never showed when the reading was taken** — same gap #30 closed on `CurrentWeatherCard`: `AirQualityDto.time` (offset-qualified by `OpenMeteoAirQualityClient.ParseLocalTime`) was on every response but never rendered, and air-quality data updates hourly at best | Yes — field already fetched, same `HH:MM` slice as #30 | Small: appended to the AQI line | ✅ Done — "European AQI 42 · Updated 14:00 local time" |
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.

@@ -48,7 +48,12 @@ export function AirQualityPanel({ location }: { location: SelectedLocation }) {
               <p className={`mt-3 text-2xl font-semibold tracking-tight ${colorClass}`}>{label}</p>
               {/* The index itself was only ever used to pick the label/color -- each band spans
                   20 points (lib/airQuality.ts), so the number tells a borderline day from a clear one. */}
-              <p className="text-xs text-ink-muted">European AQI {Math.round(displayData.europeanAqi)}</p>
+              {/* Same "Updated HH:MM local time" CurrentWeatherCard shows -- AirQualityDto.time is
+                  in the location's own UTC offset too, and air-quality data updates hourly at
+                  best, so how old the reading is matters even more here. */}
+              <p className="text-xs text-ink-muted">
+                European AQI {Math.round(displayData.europeanAqi)} · Updated {displayData.time.slice(11, 16)} local time
+              </p>
               <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-4 text-sm">
                 <div>
                   <dt className="text-xs text-ink-muted">PM2.5</dt>
