@@ -19,7 +19,15 @@ import { evaluateWeatherAlerts } from "@/lib/weatherAlerts";
 import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
 import { ExportSnapshotButton } from "@/components/ExportSnapshotButton";
 
-function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation; unit: UnitSystem }) {
+function FavoriteConditionsTile({
+  location,
+  unit,
+  onSelect,
+}: {
+  location: SelectedLocation;
+  unit: UnitSystem;
+  onSelect: (location: SelectedLocation) => void;
+}) {
   // Same query keys as CurrentWeatherCard / AirQualityPanel / WeatherAlertBanner -- if this favorite is also the
   // currently selected location, TanStack Query serves the cached result
   // instead of firing a second request.
@@ -57,7 +65,14 @@ function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation
   const alerts = evaluateWeatherAlerts(displayData, displayForecast?.hourly ?? [], unit);
 
   return (
-    <div className="flex min-w-[8rem] flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-2.5 text-center shadow-sm">
+    // A button rather than a plain card: comparing favorites and then wanting the full view for
+    // one of them meant hunting for the same name again in the FavoriteLocations chips above.
+    <button
+      type="button"
+      onClick={() => onSelect(location)}
+      title={`Show full weather for ${location.label}`}
+      className="flex min-w-[8rem] flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-2.5 text-center shadow-sm transition-shadow hover:shadow-md"
+    >
       <span className="text-xs text-ink-muted">{location.label}</span>
       {isLoading && <span className="text-xs text-ink-secondary">…</span>}
       {isError && !fallback && <span className="text-xs text-ink-secondary">n/a</span>}
@@ -87,7 +102,7 @@ function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation
           ⚠ {alerts.length} active {alerts.length === 1 ? "alert" : "alerts"}
         </span>
       )}
-    </div>
+    </button>
   );
 }
 
@@ -95,7 +110,13 @@ function FavoriteConditionsTile({ location, unit }: { location: SelectedLocation
 // is already covered by the main dashboard view for that location.
 const MIN_FAVORITES_TO_COMPARE = 2;
 
-export function FavoritesComparisonGrid({ unit }: { unit: UnitSystem }) {
+export function FavoritesComparisonGrid({
+  unit,
+  onSelect,
+}: {
+  unit: UnitSystem;
+  onSelect: (location: SelectedLocation) => void;
+}) {
   const { favorites } = useFavoriteLocations();
   const gridRef = useRef<HTMLElement>(null);
 
@@ -111,7 +132,12 @@ export function FavoritesComparisonGrid({ unit }: { unit: UnitSystem }) {
       </div>
       <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">
         {favorites.map((favorite) => (
-          <FavoriteConditionsTile key={`${favorite.latitude},${favorite.longitude}`} location={favorite} unit={unit} />
+          <FavoriteConditionsTile
+            key={`${favorite.latitude},${favorite.longitude}`}
+            location={favorite}
+            unit={unit}
+            onSelect={onSelect}
+          />
         ))}
       </div>
     </section>
