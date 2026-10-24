@@ -150,3 +150,12 @@ database, or SignalR — see `CLAUDE.md` §1.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 13, 2026-10-24)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 34 | **`FavoriteLocations` chips never marked the active location** — every favorite chip looked identical, including the one currently shown below, so with several favorites there was no at-a-glance "which one am I looking at" | Yes — `selected` is already a prop of the component | Small: compare by coordinates (same rule as `useFavoriteLocations.sameLocation`), accent styling + `aria-current` | ✅ Done |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.

@@ -32,16 +32,25 @@ export function FavoriteLocations({
         </button>
       )}
 
-      {favorites.map((favorite) => (
-        <button
-          key={`${favorite.latitude},${favorite.longitude}`}
-          type="button"
-          onClick={() => onSelect(favorite)}
-          className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-ink-secondary transition-colors hover:bg-accent/10 hover:text-accent"
-        >
-          {favorite.label}
-        </button>
-      ))}
+      {favorites.map((favorite) => {
+        // The chips never showed which favorite is the one currently on screen -- every chip
+        // looked the same, including the active one.
+        const isCurrent =
+          selected !== null && selected.latitude === favorite.latitude && selected.longitude === favorite.longitude;
+        return (
+          <button
+            key={`${favorite.latitude},${favorite.longitude}`}
+            type="button"
+            onClick={() => onSelect(favorite)}
+            aria-current={isCurrent ? "true" : undefined}
+            className={`rounded-full border border-border px-3 py-1 text-xs font-medium transition-colors hover:bg-accent/10 hover:text-accent ${
+              isCurrent ? "bg-accent/10 text-accent" : "bg-card text-ink-secondary"
+            }`}
+          >
+            {favorite.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
