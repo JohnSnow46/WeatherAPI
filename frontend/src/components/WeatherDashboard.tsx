@@ -112,7 +112,7 @@ export function WeatherDashboard() {
         selected={selected}
         onSelect={(location) => setSelected(location)}
       />
-      <FavoritesComparisonGrid unit={unit} onSelect={(location) => setSelected(location)} />
+      <FavoritesComparisonGrid selected={selected} unit={unit} onSelect={(location) => setSelected(location)} />
 
       {geolocation.state.status === "loading" && (
         <p className="text-sm text-ink-secondary">Requesting your location…</p>

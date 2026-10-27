@@ -22,10 +22,12 @@ import { ExportSnapshotButton } from "@/components/ExportSnapshotButton";
 function FavoriteConditionsTile({
   location,
   unit,
+  isCurrent,
   onSelect,
 }: {
   location: SelectedLocation;
   unit: UnitSystem;
+  isCurrent: boolean;
   onSelect: (location: SelectedLocation) => void;
 }) {
   // Same query keys as CurrentWeatherCard / AirQualityPanel / WeatherAlertBanner -- if this favorite is also the
@@ -71,7 +73,10 @@ function FavoriteConditionsTile({
       type="button"
       onClick={() => onSelect(location)}
       title={`Show full weather for ${location.label}`}
-      className="flex min-w-[8rem] flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-2.5 text-center shadow-sm transition-shadow hover:shadow-md"
+      aria-current={isCurrent ? "true" : undefined}
+      className={`flex min-w-[8rem] flex-col items-center gap-1 rounded-2xl border bg-card px-3 py-2.5 text-center shadow-sm transition-shadow hover:shadow-md ${
+        isCurrent ? "border-accent ring-1 ring-accent" : "border-border"
+      }`}
     >
       <span className="text-xs text-ink-muted">{location.label}</span>
       {isLoading && <span className="text-xs text-ink-secondary">…</span>}
@@ -111,9 +116,11 @@ function FavoriteConditionsTile({
 const MIN_FAVORITES_TO_COMPARE = 2;
 
 export function FavoritesComparisonGrid({
+  selected,
   unit,
   onSelect,
 }: {
+  selected: SelectedLocation | null;
   unit: UnitSystem;
   onSelect: (location: SelectedLocation) => void;
 }) {
@@ -136,6 +143,11 @@ export function FavoritesComparisonGrid({
             key={`${favorite.latitude},${favorite.longitude}`}
             location={favorite}
             unit={unit}
+            // Same coordinate match FavoriteLocations uses for its chips (roadmap #34) -- the
+            // tiles were the one remaining list of favorites that didn't mark the active one.
+            isCurrent={
+              selected !== null && selected.latitude === favorite.latitude && selected.longitude === favorite.longitude
+            }
             onSelect={onSelect}
           />
         ))}
