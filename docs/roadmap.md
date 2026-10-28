@@ -166,6 +166,7 @@ database, or SignalR — see `CLAUDE.md` §1.
 |---|---|---|---|---|
 | 35 | **`FavoritesComparisonGrid` tiles never marked the active location** — #34 highlighted the current favorite among the chips, but the comparison tiles right below (clickable since #33) still all looked the same | Yes — `selected` already lives in `WeatherDashboard`; same coordinate match as #34 | Small: thread `selected` into the grid, accent border/ring + `aria-current` on the matching tile | ✅ Done |
 | 36 | **The browser tab never said which location it showed** — the title was always the static "WeatherMap" from `layout.tsx` metadata, so with several tabs open (or the page in the background) every tab looked the same | Yes — `selected` already lives in `WeatherDashboard` | Small: one `useEffect` setting `document.title` | ✅ Done — "Warsaw, Poland · WeatherMap" |
+| 37 | **"Use my location" stayed clickable while locating** — a second click during a pending request fired another `getCurrentPosition`, and the button itself gave no feedback beyond the small "Requesting your location…" line below | Yes — `useGeolocation` already exposes `status: "loading"` | Small: `disabled` + "Locating…" label while loading | ✅ Done |
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.

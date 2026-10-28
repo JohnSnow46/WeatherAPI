@@ -97,12 +97,15 @@ export function WeatherDashboard() {
             })
           }
         />
+        {/* Clicking again while a request was pending fired a second getCurrentPosition, and the
+            button gave no hint anything was happening besides the small status line below. */}
         <button
           type="button"
           onClick={geolocation.request}
-          className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-accent/10 hover:text-accent"
+          disabled={geolocation.state.status === "loading"}
+          className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-accent/10 hover:text-accent disabled:cursor-wait disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-ink-secondary"
         >
-          Use my location
+          {geolocation.state.status === "loading" ? "Locating…" : "Use my location"}
         </button>
         <button
           type="button"
