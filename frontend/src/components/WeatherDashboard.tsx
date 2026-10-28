@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -67,6 +67,17 @@ export function WeatherDashboard() {
     setSelected(DEFAULT_LOCATION);
   }, [setSelected]);
 
+  // Every non-geolocation way of picking a location goes through here, so a leftover
+  // geolocation error from an earlier attempt doesn't linger under the new selection.
+  const { reset: resetGeolocation } = geolocation;
+  const selectLocation = useCallback(
+    (location: SelectedLocation) => {
+      resetGeolocation();
+      setSelected(location);
+    },
+    [resetGeolocation, setSelected],
+  );
+
   // The tab always read just "WeatherMap" (layout.tsx metadata), so with a few tabs open --
   // or the page left in the background -- nothing said which location it was showing.
   useEffect(() => {
@@ -89,7 +100,7 @@ export function WeatherDashboard() {
       <div className="flex w-full flex-col items-center gap-3 rounded-full border border-border bg-card p-2 shadow-sm sm:flex-row sm:justify-center">
         <LocationSearch
           onSelect={(location) =>
-            setSelected({
+            selectLocation({
               label: formatSearchLabel(location),
               latitude: location.latitude,
               longitude: location.longitude,
@@ -119,9 +130,9 @@ export function WeatherDashboard() {
 
       <FavoriteLocations
         selected={selected}
-        onSelect={(location) => setSelected(location)}
+        onSelect={selectLocation}
       />
-      <FavoritesComparisonGrid selected={selected} unit={unit} onSelect={(location) => setSelected(location)} />
+      <FavoritesComparisonGrid selected={selected} unit={unit} onSelect={selectLocation} />
 
       {geolocation.state.status === "loading" && (
         <p className="text-sm text-ink-secondary">Requesting your location…</p>

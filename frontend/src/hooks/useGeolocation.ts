@@ -34,8 +34,13 @@ export function useGeolocation() {
     );
   }, []);
 
+  // Lets the caller drop a stale error/loading line once the user has picked a location
+  // some other way (search, favorites) -- otherwise "permission denied" stayed on screen
+  // under a perfectly good forecast for the city they chose instead.
+  const reset = useCallback(() => setState({ status: "idle" }), []);
+
   // Memoized so consumers can depend on the whole returned object without
   // the effect re-running every render (it would otherwise be a fresh
   // object literal each time, even though `request` itself is stable).
-  return useMemo(() => ({ state, request }), [state, request]);
+  return useMemo(() => ({ state, request, reset }), [state, request, reset]);
 }
