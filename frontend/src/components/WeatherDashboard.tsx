@@ -67,6 +67,12 @@ export function WeatherDashboard() {
     setSelected(DEFAULT_LOCATION);
   }, [setSelected]);
 
+  // The tab always read just "WeatherMap" (layout.tsx metadata), so with a few tabs open --
+  // or the page left in the background -- nothing said which location it was showing.
+  useEffect(() => {
+    document.title = selected ? `${selected.label} · WeatherMap` : "WeatherMap";
+  }, [selected]);
+
   useEffect(() => {
     if (geolocation.state.status === "success") {
       setSelected({

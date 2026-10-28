@@ -160,11 +160,12 @@ database, or SignalR — see `CLAUDE.md` §1.
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
 
-## Next steps (round 14, 2026-10-27)
+## Next steps (round 14, 2026-10-27 → 2026-10-28)
 
 | # | Feature | Fits current architecture? | Rough scope | Status |
 |---|---|---|---|---|
 | 35 | **`FavoritesComparisonGrid` tiles never marked the active location** — #34 highlighted the current favorite among the chips, but the comparison tiles right below (clickable since #33) still all looked the same | Yes — `selected` already lives in `WeatherDashboard`; same coordinate match as #34 | Small: thread `selected` into the grid, accent border/ring + `aria-current` on the matching tile | ✅ Done |
+| 36 | **The browser tab never said which location it showed** — the title was always the static "WeatherMap" from `layout.tsx` metadata, so with several tabs open (or the page in the background) every tab looked the same | Yes — `selected` already lives in `WeatherDashboard` | Small: one `useEffect` setting `document.title` | ✅ Done — "Warsaw, Poland · WeatherMap" |
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
