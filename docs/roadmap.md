@@ -177,6 +177,7 @@ database, or SignalR — see `CLAUDE.md` §1.
 | # | Feature | Fits current architecture? | Rough scope | Status |
 |---|---|---|---|---|
 | 39 | **Selected-location label dropped the region** — `LocationSearch`'s dropdown shows "Springfield, Illinois, United States", but `WeatherDashboard.formatSearchLabel` stored only name + country, so two same-named cities became identical favorites, comparison tiles and tab titles | Yes — `admin1` is already on `LocationDto` | Small: one-line label change (already-saved favorites keep their old label) | ✅ Done |
+| 40 | **Enter in the search box did nothing unless a result was highlighted** — typing "Berlin" and pressing Enter is the most common way to search, but without first pressing ↓ the keypress was ignored | Yes — same `handleKeyDown` | Small: Enter falls back to the first result while the dropdown has results | ✅ Done |
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.

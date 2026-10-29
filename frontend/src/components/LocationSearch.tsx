@@ -72,7 +72,7 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
   const showResults = isOpen && query.trim().length >= 2;
   const navigableResults = showResults && !isSearching && !error ? results : [];
 
-  // Arrow keys move through the dropdown, Enter picks the highlighted result, Escape closes
+  // Arrow keys move through the dropdown, Enter picks the highlighted (or first) result, Escape closes
   // it -- previously the list was mouse-only, so a keyboard user could type a query but
   // never choose a result.
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -93,9 +93,11 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex((i) => (i <= 0 ? navigableResults.length - 1 : i - 1));
-    } else if (e.key === "Enter" && activeIndex >= 0 && activeIndex < navigableResults.length) {
+    } else if (e.key === "Enter") {
+      // Enter with nothing highlighted used to do nothing at all -- typing "Berlin" and pressing
+      // Enter is the most common way to search, so take the top match in that case.
       e.preventDefault();
-      selectLocation(navigableResults[activeIndex]);
+      selectLocation(navigableResults[activeIndex >= 0 && activeIndex < navigableResults.length ? activeIndex : 0]);
     }
   }
 
