@@ -24,8 +24,11 @@ const WeatherMap = dynamic(() => import("@/components/WeatherMap").then((mod) =>
 
 const STORAGE_KEY = "weathermap:selected-location";
 
+// Keeps the region (admin1) that LocationSearch's dropdown already shows -- without it, picking
+// "Springfield, Illinois" and "Springfield, Missouri" both stored "Springfield, United States",
+// so the two favorites, comparison tiles and the tab title were indistinguishable.
 function formatSearchLabel(location: LocationDto): string {
-  return [location.name, location.country].filter(Boolean).join(", ");
+  return [location.name, location.admin1, location.country].filter(Boolean).join(", ");
 }
 
 export function WeatherDashboard() {
