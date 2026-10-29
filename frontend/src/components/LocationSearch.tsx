@@ -123,6 +123,9 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
         onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         onKeyDown={handleKeyDown}
         role="combobox"
+        // The placeholder was the only name this combobox had -- screen readers don't reliably
+        // announce a placeholder, and it disappears as soon as you type.
+        aria-label="Search for a city"
         aria-expanded={showResults}
         aria-controls="location-search-results"
         aria-autocomplete="list"
@@ -139,6 +142,7 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
         <ul
           id="location-search-results"
           role="listbox"
+          aria-label="Matching locations"
           className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
         >
           {isSearching && <li className="px-4 py-2 text-sm text-ink-secondary">Searching…</li>}
