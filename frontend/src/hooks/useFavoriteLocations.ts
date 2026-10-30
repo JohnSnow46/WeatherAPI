@@ -5,7 +5,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { isValidSelectedLocation, type SelectedLocation } from "@/lib/location";
 
 const STORAGE_KEY = "weathermap:favorite-locations";
-const MAX_FAVORITES = 8;
+export const MAX_FAVORITES = 8;
 
 function sameLocation(a: SelectedLocation, b: SelectedLocation): boolean {
   return a.latitude === b.latitude && a.longitude === b.longitude;

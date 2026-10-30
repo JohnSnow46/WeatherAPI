@@ -1,6 +1,6 @@
 "use client";
 
-import { useFavoriteLocations } from "@/hooks/useFavoriteLocations";
+import { MAX_FAVORITES, useFavoriteLocations } from "@/hooks/useFavoriteLocations";
 import type { SelectedLocation } from "@/lib/location";
 
 export function FavoriteLocations({
@@ -17,6 +17,10 @@ export function FavoriteLocations({
   }
 
   const selectedIsFavorite = selected ? isFavorite(selected) : false;
+  // addFavorite silently drops the oldest favorite once the list is full -- say so on the star
+  // before it happens instead of letting a saved city just vanish from the chips.
+  const evictedOnSave = !selectedIsFavorite && favorites.length >= MAX_FAVORITES ? favorites[0] : null;
+  const saveLabel = evictedOnSave ? `Save to favorites (replaces ${evictedOnSave.label})` : "Save to favorites";
 
   return (
     <div className="flex w-full max-w-3xl flex-wrap items-center justify-center gap-2">
@@ -24,7 +28,8 @@ export function FavoriteLocations({
         <button
           type="button"
           onClick={() => (selectedIsFavorite ? removeFavorite(selected) : addFavorite(selected))}
-          aria-label={selectedIsFavorite ? "Remove from favorites" : "Save to favorites"}
+          aria-label={selectedIsFavorite ? "Remove from favorites" : saveLabel}
+          title={selectedIsFavorite ? "Remove from favorites" : saveLabel}
           aria-pressed={selectedIsFavorite}
           className="rounded-full px-2 py-1 text-sm text-ink-secondary transition-colors hover:bg-accent/10 hover:text-accent"
         >
