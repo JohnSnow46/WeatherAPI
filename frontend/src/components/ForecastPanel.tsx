@@ -83,14 +83,16 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
         </div>
         <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">
           {upcomingHourly.map((point) => {
-            const { icon } = describeWeatherCode(point.weatherCode);
+            const { label, icon } = describeWeatherCode(point.weatherCode);
             return (
               <div
                 key={point.time}
                 className="flex min-w-[4.5rem] flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-2.5 text-center shadow-sm transition-shadow hover:shadow-md"
               >
                 <span className="text-xs text-ink-muted">{formatHour(point.time)}</span>
-                <span className="text-xl" aria-hidden>
+                {/* The icon is the only place these cards state the conditions, so it can't be
+                    aria-hidden -- expose the label as its accessible name (and hover title). */}
+                <span className="text-xl" role="img" aria-label={label} title={label}>
                   {icon}
                 </span>
                 <span className="text-sm font-medium text-ink-primary">
@@ -143,7 +145,7 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
                 className="flex flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-3 text-center shadow-sm transition-shadow hover:shadow-md"
               >
                 <span className="text-sm font-medium text-ink-primary">{formatWeekday(point.date)}</span>
-                <span className="text-2xl" aria-hidden title={label}>
+                <span className="text-2xl" role="img" aria-label={label} title={label}>
                   {icon}
                 </span>
                 <span className="text-sm text-ink-secondary">

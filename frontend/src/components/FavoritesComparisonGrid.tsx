@@ -83,7 +83,13 @@ function FavoriteConditionsTile({
       {isError && !fallback && <span className="text-xs text-ink-secondary">n/a</span>}
       {displayData && (
         <>
-          <span className="text-xl" aria-hidden>
+          {/* Same as the forecast cards: the icon is the tile's only statement of the conditions. */}
+          <span
+            className="text-xl"
+            role="img"
+            aria-label={describeWeatherCode(displayData.weatherCode).label}
+            title={describeWeatherCode(displayData.weatherCode).label}
+          >
             {describeWeatherCode(displayData.weatherCode).icon}
           </span>
           <span className="text-sm font-medium text-ink-primary">
