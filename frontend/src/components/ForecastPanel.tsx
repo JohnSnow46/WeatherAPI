@@ -99,9 +99,12 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
                 {/* Same treatment the daily cards got for precipitationSumMm -- the hourly
                     precipitationMm was fetched but never shown, so "which hour will it rain"
                     was only guessable from the icon. */}
+                {/* The daily cards print the unit after the amount; the hourly one was a bare
+                    number, so "0.04" could be read as mm while the toggle said imperial. */}
                 {point.precipitationMm > 0 && (
                   <span className="text-[10px] text-ink-muted">
-                    💧 {toDisplayPrecipitation(point.precipitationMm, unit).toFixed(unit === "imperial" ? 2 : 1)}
+                    💧 {toDisplayPrecipitation(point.precipitationMm, unit).toFixed(unit === "imperial" ? 2 : 1)}{" "}
+                    {precipitationUnitLabel(unit)}
                   </span>
                 )}
               </div>

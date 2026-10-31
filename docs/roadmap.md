@@ -189,6 +189,7 @@ database, or SignalR — see `CLAUDE.md` §1.
 |---|---|---|---|---|
 | 42 | **A favorite could only be removed after switching to it** — the only way to drop a chip was to select it (loading its whole forecast) and then un-star it, so cleaning up the shortlist meant visiting every city you no longer wanted | Yes — `removeFavorite` already exists in `useFavoriteLocations` | Small: a "×" button on each chip next to its label, with its own `aria-label` | ✅ Done |
 | 43 | **Saving a 9th favorite silently dropped the oldest** — `useFavoriteLocations` caps the list at 8 and evicts the first entry, but nothing said so, so a saved city just disappeared from the chips | Yes — the cap and order already live in `useFavoriteLocations` | Small: export `MAX_FAVORITES`; when full, the star's tooltip/`aria-label` names the favorite that saving will replace | ✅ Done |
+| 44 | **Hourly precipitation was a bare number** — the daily cards print "💧 3.2 mm" (or "in" under imperial), but the hourly cards added later showed just "💧 0.4", so the amount didn't say which unit it was in | Yes — `precipitationUnitLabel` already exists in `lib/units` | Small: append the same unit label on the hourly cards | ✅ Done |
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
