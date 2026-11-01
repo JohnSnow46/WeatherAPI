@@ -121,11 +121,18 @@ export function WeatherDashboard() {
         >
           {geolocation.state.status === "loading" ? "Locating…" : "Use my location"}
         </button>
+        {/* The fixed "Toggle between metric and imperial units" label replaced the visible °C/°F
+            text for screen readers, so they never heard which unit was actually in use. */}
         <button
           type="button"
           onClick={() => setUnit(unit === "imperial" ? "metric" : "imperial")}
           className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-accent/10 hover:text-accent"
-          aria-label="Toggle between metric and imperial units"
+          aria-label={
+            unit === "imperial"
+              ? "Units: imperial (°F). Switch to metric"
+              : "Units: metric (°C). Switch to imperial"
+          }
+          title={unit === "imperial" ? "Switch to metric (°C)" : "Switch to imperial (°F)"}
         >
           {unit === "imperial" ? "°F" : "°C"}
         </button>
