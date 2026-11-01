@@ -144,12 +144,15 @@ export function WeatherDashboard() {
       />
       <FavoritesComparisonGrid selected={selected} unit={unit} onSelect={selectLocation} />
 
+      {/* These appear in response to the "Use my location" click, possibly long after it (the
+          browser's permission prompt), so without a live region a screen reader user never heard
+          that the lookup was running or why it failed. */}
       {geolocation.state.status === "loading" && (
-        <p className="text-sm text-ink-secondary">Requesting your location…</p>
+        <p role="status" className="text-sm text-ink-secondary">Requesting your location…</p>
       )}
 
       {geolocation.state.status === "error" && (
-        <p className="max-w-sm text-center text-sm text-ink-secondary">{geolocation.state.message}</p>
+        <p role="alert" className="max-w-sm text-center text-sm text-ink-secondary">{geolocation.state.message}</p>
       )}
 
       {selected && (
