@@ -51,7 +51,9 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
   if (isLoading) {
     return (
       <div>
-        <p className="text-sm text-ink-secondary">Loading forecast…</p>
+        <p role="status" className="text-sm text-ink-secondary">
+          Loading forecast…
+        </p>
         {isSlow && <ColdStartNotice />}
       </div>
     );

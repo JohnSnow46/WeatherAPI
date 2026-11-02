@@ -65,7 +65,11 @@ export function CurrentWeatherCard({ location, unit }: { location: SelectedLocat
         {displayData && <ExportSnapshotButton targetRef={cardRef} fileName={`weather-${location.label}`} />}
       </div>
 
-      {isLoading && <p className="mt-4 text-sm text-ink-secondary">Loading current weather…</p>}
+      {isLoading && (
+        <p role="status" className="mt-4 text-sm text-ink-secondary">
+          Loading current weather…
+        </p>
+      )}
       {isSlow && <ColdStartNotice />}
 
       {isError && !fallback && (

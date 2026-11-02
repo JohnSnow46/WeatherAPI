@@ -19,7 +19,11 @@ import { WeatherAlertBanner } from "@/components/WeatherAlertBanner";
 // server even inside a "use client" file — load it client-only.
 const WeatherMap = dynamic(() => import("@/components/WeatherMap").then((mod) => mod.WeatherMap), {
   ssr: false,
-  loading: () => <p className="text-sm text-ink-secondary">Loading map…</p>,
+  loading: () => (
+    <p role="status" className="text-sm text-ink-secondary">
+      Loading map…
+    </p>
+  ),
 });
 
 const STORAGE_KEY = "weathermap:selected-location";

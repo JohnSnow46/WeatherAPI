@@ -29,7 +29,11 @@ export function AirQualityPanel({ location }: { location: SelectedLocation }) {
         {displayData && <ExportSnapshotButton targetRef={panelRef} fileName={`air-quality-${location.label}`} />}
       </div>
 
-      {isLoading && <p className="mt-4 text-sm text-ink-secondary">Loading air quality…</p>}
+      {isLoading && (
+        <p role="status" className="mt-4 text-sm text-ink-secondary">
+          Loading air quality…
+        </p>
+      )}
       {isSlow && <ColdStartNotice />}
 
       {isError && !fallback && (
