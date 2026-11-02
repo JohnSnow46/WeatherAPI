@@ -61,7 +61,7 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
 
   if (isError && !fallback) {
     return (
-      <p className="text-sm text-red-500">
+      <p role="alert" className="text-sm text-red-500">
         {error instanceof ApiError ? error.message : "Could not load the forecast."}
       </p>
     );

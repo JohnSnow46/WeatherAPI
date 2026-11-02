@@ -73,7 +73,7 @@ export function CurrentWeatherCard({ location, unit }: { location: SelectedLocat
       {isSlow && <ColdStartNotice />}
 
       {isError && !fallback && (
-        <p className="mt-4 text-sm text-red-500">
+        <p role="alert" className="mt-4 text-sm text-red-500">
           {error instanceof ApiError ? error.message : "Could not load current weather."}
         </p>
       )}
