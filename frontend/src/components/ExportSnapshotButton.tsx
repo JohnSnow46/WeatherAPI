@@ -41,17 +41,25 @@ export function ExportSnapshotButton({
     }
   }
 
+  const label = failed ? "Export failed, try again" : "Export as PNG";
+
   return (
-    <button
-      type="button"
-      onClick={handleExport}
-      disabled={isExporting}
-      title="Export as PNG"
-      aria-label="Export as PNG"
-      className="shrink-0 rounded-full p-1 text-ink-muted transition hover:bg-black/5 hover:text-ink-primary disabled:opacity-50 dark:hover:bg-white/10"
-    >
-      <span aria-hidden>{isExporting ? "…" : "📷"}</span>
-      {failed && <span className="sr-only">Export failed</span>}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={handleExport}
+        disabled={isExporting}
+        title={label}
+        aria-label={label}
+        className="shrink-0 rounded-full p-1 text-ink-muted transition hover:bg-black/5 hover:text-ink-primary disabled:opacity-50 dark:hover:bg-white/10"
+      >
+        <span aria-hidden>{isExporting ? "…" : failed ? "⚠️" : "📷"}</span>
+      </button>
+      {/* Outside the button: its aria-label replaces anything inside it, so text in there is never
+          read. Always rendered, because a live region has to exist before its text changes. */}
+      <span role="alert" className="sr-only">
+        {failed ? "Export failed" : ""}
+      </span>
+    </>
   );
 }
