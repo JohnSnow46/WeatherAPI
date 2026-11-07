@@ -92,7 +92,7 @@ export function WeatherMap({ location, unit }: { location: SelectedLocation; uni
           ))}
         </LayersControl>
 
-        <MapLegend initialActiveOverlays={initialActiveOverlays} unit={unit} />
+        <MapLegend initialActiveOverlays={initialActiveOverlays} unit={unit} radarFrameTime={latestPastFrame?.time} />
 
         <Marker position={[location.latitude, location.longitude]}>
           <Popup>{location.label}</Popup>

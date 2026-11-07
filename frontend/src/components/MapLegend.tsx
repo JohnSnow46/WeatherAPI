@@ -93,6 +93,14 @@ function gradientLegends(unit: UnitSystem): LegendEntry[] {
 
 const RADAR_OVERLAY_NAME = "Precipitation / storm radar";
 
+/**
+ * RainViewer's frame time is a Unix timestamp (seconds, UTC). Shown in the viewer's own
+ * clock, since the map has no time zone for the selected location -- hence "your time".
+ */
+function formatRadarFrameTime(unixSeconds: number): string {
+  return new Date(unixSeconds * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
 function GradientSwatch({ title, unit, stops, labelValues, formatValue }: Omit<LegendEntry, "overlayName">) {
   const min = stops[0].value;
   const max = stops[stops.length - 1].value;
@@ -131,9 +139,12 @@ function GradientSwatch({ title, unit, stops, labelValues, formatValue }: Omit<L
 export function MapLegend({
   initialActiveOverlays = [],
   unit,
+  radarFrameTime,
 }: {
   initialActiveOverlays?: readonly string[];
   unit: UnitSystem;
+  /** Unix time (seconds) of the radar frame on the map; omitted when there is no radar layer. */
+  radarFrameTime?: number;
 }) {
   const map = useMap();
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
@@ -195,6 +206,9 @@ export function MapLegend({
           <span className="text-[10px] text-ink-muted">
             Illustrative: light to heavy (RainViewer, Universal Blue palette)
           </span>
+          {radarFrameTime !== undefined && (
+            <span className="text-[10px] text-ink-muted">Radar from {formatRadarFrameTime(radarFrameTime)} your time</span>
+          )}
         </div>
       )}
       {visibleGradientLegends.map((legend) => (
