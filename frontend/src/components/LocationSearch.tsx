@@ -72,6 +72,19 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
   const showResults = isOpen && query.trim().length >= 2;
   const navigableResults = showResults && !isSearching && !error ? results : [];
 
+  // The dropdown's "Searching…" / error / "No matching locations." rows aren't options, so a
+  // screen reader on the combobox never reached them -- typing a query just went silent.
+  // This text drives an always-present live region instead.
+  const searchStatus = !showResults
+    ? ""
+    : isSearching
+      ? "Searching…"
+      : error
+        ? error
+        : results.length === 0
+          ? "No matching locations."
+          : `${results.length} ${results.length === 1 ? "location" : "locations"} found.`;
+
   // Arrow keys move through the dropdown, Enter picks the highlighted (or first) result, Escape closes
   // it -- previously the list was mouse-only, so a keyboard user could type a query but
   // never choose a result.
@@ -138,6 +151,10 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
         className="w-full rounded-full bg-transparent py-2 pl-10 pr-4 text-sm text-ink-primary outline-none placeholder:text-ink-muted"
       />
 
+      <p role="status" className="sr-only">
+        {searchStatus}
+      </p>
+
       {showResults && (
         <ul
           id="location-search-results"
@@ -145,10 +162,20 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
           aria-label="Matching locations"
           className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
         >
-          {isSearching && <li className="px-4 py-2 text-sm text-ink-secondary">Searching…</li>}
-          {!isSearching && error && <li className="px-4 py-2 text-sm text-red-500">{error}</li>}
+          {isSearching && (
+            <li aria-hidden className="px-4 py-2 text-sm text-ink-secondary">
+              Searching…
+            </li>
+          )}
+          {!isSearching && error && (
+            <li aria-hidden className="px-4 py-2 text-sm text-red-500">
+              {error}
+            </li>
+          )}
           {!isSearching && !error && results.length === 0 && (
-            <li className="px-4 py-2 text-sm text-ink-secondary">No matching locations.</li>
+            <li aria-hidden className="px-4 py-2 text-sm text-ink-secondary">
+              No matching locations.
+            </li>
           )}
           {!isSearching &&
             !error &&
