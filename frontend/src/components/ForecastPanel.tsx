@@ -32,6 +32,16 @@ function formatWeekday(isoDate: string): string {
   });
 }
 
+function formatMonthDay(isoDate: string): string {
+  // The weekday alone stopped being enough once the 14-day range existed: two "Mon" cards
+  // in the same grid with nothing telling which week each one is.
+  return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 export function ForecastPanel({ location, unit }: { location: SelectedLocation; unit: UnitSystem }) {
   // Lazy initializer: runs once on mount rather than on every render, so
   // "upcoming" filtering below doesn't call an impure function during render.
@@ -147,6 +157,7 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
                 className="flex flex-col items-center gap-1 rounded-2xl border border-border bg-card px-3 py-3 text-center shadow-sm transition-shadow hover:shadow-md"
               >
                 <span className="text-sm font-medium text-ink-primary">{formatWeekday(point.date)}</span>
+                <span className="text-xs text-ink-muted">{formatMonthDay(point.date)}</span>
                 <span className="text-2xl" role="img" aria-label={label} title={label}>
                   {icon}
                 </span>

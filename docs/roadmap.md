@@ -201,3 +201,12 @@ database, or SignalR — see `CLAUDE.md` §1.
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.
+
+## Next steps (round 17, 2026-11-08)
+
+| # | Feature | Fits current architecture? | Rough scope | Status |
+|---|---|---|---|---|
+| 53 | **Daily cards showed only the weekday** — fine for 3 or 7 days, but the 14-day range put two "Mon", two "Tue"… cards in the same grid with nothing saying which week each one was | Yes — `point.date` is already on every daily point | Small: a "Nov 9"-style date line under the weekday (en-US, UTC like the weekday) | ✅ Done |
+
+**Not planned, deliberately (still applies):** user accounts/login, a real
+database, or SignalR — see `CLAUDE.md` §1.
