@@ -140,7 +140,7 @@ export function FavoritesComparisonGrid({
   return (
     <section ref={gridRef} className="flex w-full max-w-3xl flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-medium text-ink-secondary">Comparing your favorites</h3>
+        <h2 className="text-sm font-medium text-ink-secondary">Comparing your favorites</h2>
         <ExportSnapshotButton targetRef={gridRef} fileName="weather-comparison" />
       </div>
       <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">

@@ -207,6 +207,7 @@ database, or SignalR — see `CLAUDE.md` §1.
 | # | Feature | Fits current architecture? | Rough scope | Status |
 |---|---|---|---|---|
 | 53 | **Daily cards showed only the weekday** — fine for 3 or 7 days, but the 14-day range put two "Mon", two "Tue"… cards in the same grid with nothing saying which week each one was | Yes — `point.date` is already on every daily point | Small: a "Nov 9"-style date line under the weekday (en-US, UTC like the weekday) | ✅ Done |
+| 54 | **Some section headings skipped a level** — under the page's `h1` the current-weather card and air-quality panel used `h2`, but "Comparing your favorites", "Next hours" and "Next days" were `h3`, so a screen reader's heading list nested the forecast under "Air quality" and the comparison grid under nothing | Yes — markup only, same classes | Small: those three become `h2`; the look is unchanged | ✅ Done |
 
 **Not planned, deliberately (still applies):** user accounts/login, a real
 database, or SignalR — see `CLAUDE.md` §1.

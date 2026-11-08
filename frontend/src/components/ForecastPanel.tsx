@@ -90,7 +90,7 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
       {fallback && <StaleDataBanner cachedAt={fallback.cachedAt} />}
       <section>
         <div className="mb-2 flex items-center justify-between gap-2">
-          <h3 className="text-sm font-medium text-ink-secondary">Next hours</h3>
+          <h2 className="text-sm font-medium text-ink-secondary">Next hours</h2>
           <ExportSnapshotButton targetRef={panelRef} fileName={`forecast-${location.label}`} />
         </div>
         <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">
@@ -129,7 +129,7 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
 
       <section>
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-sm font-medium text-ink-secondary">Next days</h3>
+          <h2 className="text-sm font-medium text-ink-secondary">Next days</h2>
           <div role="group" aria-label="Forecast range" className="flex gap-1">
             {DAY_RANGE_OPTIONS.map((option) => (
               <button
