@@ -161,11 +161,15 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
                 <span className="text-2xl" role="img" aria-label={label} title={label}>
                   {icon}
                 </span>
+                {/* "21° / 12°" relies on the bold-first convention to say which is the high --
+                    read aloud it was just two numbers with a slash between them. */}
                 <span className="text-sm text-ink-secondary">
+                  <span className="sr-only">High </span>
                   <span className="font-medium text-ink-primary">
                     {Math.round(toDisplayTemperature(point.tempMaxC, unit))}°
                   </span>
-                  {" / "}
+                  <span aria-hidden="true">{" / "}</span>
+                  <span className="sr-only">, low </span>
                   {Math.round(toDisplayTemperature(point.tempMinC, unit))}°
                 </span>
                 {/* precipitationSumMm was always on DailyForecastPointDto but never rendered --
