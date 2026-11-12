@@ -93,7 +93,14 @@ export function ForecastPanel({ location, unit }: { location: SelectedLocation; 
           <h2 className="text-sm font-medium text-ink-secondary">Next hours</h2>
           <ExportSnapshotButton targetRef={panelRef} fileName={`forecast-${location.label}`} />
         </div>
-        <div className="scrollbar-thin flex gap-3 overflow-x-auto pb-2">
+        {/* The strip scrolls sideways but nothing in it is focusable, so keyboard users could
+            never reach the later hours -- make the strip itself a focusable, named region. */}
+        <div
+          role="region"
+          aria-label="Hourly forecast"
+          tabIndex={0}
+          className="scrollbar-thin flex gap-3 overflow-x-auto rounded-2xl pb-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
           {upcomingHourly.map((point) => {
             const { label, icon } = describeWeatherCode(point.weatherCode);
             return (
