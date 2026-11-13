@@ -29,8 +29,9 @@ export function FavoriteLocations({
           type="button"
           onClick={() => (selectedIsFavorite ? removeFavorite(selected) : addFavorite(selected))}
           aria-label={selectedIsFavorite ? "Remove from favorites" : saveLabel}
+          // No aria-pressed: the label already flips between "Save" and "Remove", so a pressed
+          // state on top of it read as "Remove from favorites, pressed".
           title={selectedIsFavorite ? "Remove from favorites" : saveLabel}
-          aria-pressed={selectedIsFavorite}
           className="rounded-full px-2 py-1 text-sm text-ink-secondary transition-colors hover:bg-accent/10 hover:text-accent"
         >
           <span aria-hidden>{selectedIsFavorite ? "★" : "☆"}</span>
