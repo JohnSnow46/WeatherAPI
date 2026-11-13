@@ -142,6 +142,9 @@ export function LocationSearch({ onSelect }: { onSelect: (location: LocationDto)
         aria-expanded={showResults}
         aria-controls="location-search-results"
         aria-autocomplete="list"
+        // The browser's own autofill history list opened on top of the results listbox.
+        autoComplete="off"
+        spellCheck={false}
         aria-activedescendant={activeIndex >= 0 ? `location-search-result-${activeIndex}` : undefined}
         placeholder="Search for a city…"
         // Mirrors SearchLocationsQueryValidator's MaximumLength(200) on the
