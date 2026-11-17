@@ -20,6 +20,17 @@ export type CurrentWeatherDto = {
   isDay: boolean;
 };
 
+export type CoordinatesDto = {
+  latitude: number;
+  longitude: number;
+};
+
+// The backend echoes each requested coordinate pair back next to its weather, so a result
+// can be matched to its location without relying on the response order.
+export type BatchCurrentWeatherItemDto = CoordinatesDto & {
+  weather: CurrentWeatherDto;
+};
+
 export type HourlyForecastPointDto = {
   time: string;
   temperatureC: number;
@@ -70,8 +81,11 @@ type ProblemDetails = {
 // loading state indefinitely instead of surfacing an error.
 const REQUEST_TIMEOUT_MS = 15_000;
 
-async function apiFetch<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...init,
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
 
   if (!response.ok) {
     const problem: ProblemDetails | null = await response.json().catch(() => null);
@@ -90,6 +104,19 @@ export function searchLocations(query: string, count = 5): Promise<LocationDto[]
 export function getCurrentWeather(latitude: number, longitude: number): Promise<CurrentWeatherDto> {
   const params = new URLSearchParams({ lat: String(latitude), lon: String(longitude) });
   return apiFetch<CurrentWeatherDto>(`/api/weather/current?${params.toString()}`);
+}
+
+// Must match GetCurrentWeatherBatchQueryValidator.MaxLocations on the API.
+export const MAX_BATCH_LOCATIONS = 10;
+
+// One round-trip for several locations (roadmap #15). Each location still goes through the
+// backend's per-location cache, so this only saves requests, not freshness.
+export function getCurrentWeatherBatch(locations: CoordinatesDto[]): Promise<BatchCurrentWeatherItemDto[]> {
+  return apiFetch<BatchCurrentWeatherItemDto[]>("/api/weather/current/batch", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(locations),
+  });
 }
 
 export function getForecast(latitude: number, longitude: number, days = 5): Promise<ForecastDto> {
