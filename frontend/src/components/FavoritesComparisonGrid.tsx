@@ -1,10 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getAirQuality,
   getCurrentWeather,
+  getCurrentWeatherBatch,
   getForecast,
   type AirQualityDto,
   type CurrentWeatherDto,
@@ -18,25 +19,40 @@ import { describeEuropeanAqi } from "@/lib/airQuality";
 import { evaluateWeatherAlerts } from "@/lib/weatherAlerts";
 import { useOfflineFallback, locationCacheKey } from "@/hooks/useOfflineForecastCache";
 import { ExportSnapshotButton } from "@/components/ExportSnapshotButton";
+import {
+  currentWeatherBatchQueryKey,
+  currentWeatherQueryKey,
+  toCurrentWeatherEntries,
+} from "@/lib/currentWeatherBatch";
 
 function FavoriteConditionsTile({
   location,
   unit,
   isCurrent,
+  batchPending,
+  batchFailed,
   onSelect,
 }: {
   location: SelectedLocation;
   unit: UnitSystem;
   isCurrent: boolean;
+  batchPending: boolean;
+  batchFailed: boolean;
   onSelect: (location: SelectedLocation) => void;
 }) {
   // Same query keys as CurrentWeatherCard / AirQualityPanel / WeatherAlertBanner -- if this favorite is also the
   // currently selected location, TanStack Query serves the cached result
-  // instead of firing a second request.
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["current-weather", location.latitude, location.longitude],
+  // instead of firing a second request. The current conditions arrive through the grid's
+  // single batch request, which writes into this same key (roadmap #15); the tile only
+  // fetches on its own if that batch request failed.
+  const current = useQuery({
+    queryKey: currentWeatherQueryKey(location.latitude, location.longitude),
     queryFn: () => getCurrentWeather(location.latitude, location.longitude),
+    enabled: batchFailed,
   });
+  const data = current.data;
+  const isLoading = current.isLoading || (batchPending && data === undefined);
+  const isError = current.isError;
   const airQuality = useQuery({
     queryKey: ["air-quality", location.latitude, location.longitude],
     queryFn: () => getAirQuality(location.latitude, location.longitude),
@@ -132,6 +148,23 @@ export function FavoritesComparisonGrid({
 }) {
   const { favorites } = useFavoriteLocations();
   const gridRef = useRef<HTMLElement>(null);
+  const queryClient = useQueryClient();
+
+  // One request for every favorite's current conditions instead of one per tile. Results are
+  // written under the single-location keys, so the dashboard's CurrentWeatherCard still shares
+  // its entry with the matching tile. MAX_FAVORITES (8) stays under MAX_BATCH_LOCATIONS (10).
+  const locations = favorites.map(({ latitude, longitude }) => ({ latitude, longitude }));
+  const batch = useQuery({
+    queryKey: currentWeatherBatchQueryKey(locations),
+    queryFn: async () => {
+      const items = await getCurrentWeatherBatch(locations);
+      for (const [key, weather] of toCurrentWeatherEntries(items)) {
+        queryClient.setQueryData(key, weather);
+      }
+      return items;
+    },
+    enabled: favorites.length >= MIN_FAVORITES_TO_COMPARE,
+  });
 
   if (favorites.length < MIN_FAVORITES_TO_COMPARE) {
     return null;
@@ -154,6 +187,8 @@ export function FavoritesComparisonGrid({
             isCurrent={
               selected !== null && selected.latitude === favorite.latitude && selected.longitude === favorite.longitude
             }
+            batchPending={batch.isPending}
+            batchFailed={batch.isError}
             onSelect={onSelect}
           />
         ))}
